@@ -1,0 +1,3 @@
+term,B,std_error,z_value,p_value,exp_B,p_report,significance
+(Intercept),-2.350326,0.046991,-50.017,0,0.0953,< 0.001,significant
+accommodates,0.678223,0.013394,50.638,0,1.9704,< 0.001,significant

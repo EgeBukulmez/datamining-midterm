@@ -1,0 +1,11 @@
+variable,type,role,description,source,range_or_levels
+price,Numerical (continuous),Dependent variable (linear regression),Nightly price of the listing in Turkish Lira (TL),Raw 'price' converted from text,"542 - 38,286.33"
+high_price,"Categorical (binary, 0/1)",Dependent variable (logistic regression),"1 = price > median (4457.5 TL), 0 = price <= median",Derived from price,0 (8162); 1 (8141)
+accommodates,Numerical (discrete),Independent,Maximum number of guests,Raw,1 - 16
+bedrooms,Numerical (discrete),Independent,Number of bedrooms,Raw,0 - 15
+bathrooms,Numerical,Independent,Number of bathrooms (half-bath = 0.5),Derived from 'bathrooms_text',0 - 15
+number_of_reviews,Numerical (discrete),Independent,Total number of reviews received,Raw,"0 - 1,862"
+availability_365,Numerical (discrete),Independent,Number of days the listing is available in the next 365 days,Raw,0 - 365
+host_is_superhost,Categorical (binary),Independent,Whether the host has Airbnb Superhost status (reference: No),Raw (t/f) recoded to No/Yes,No (10827); Yes (5476)
+room_type,Categorical (4 categories),Independent,Type of the rented space (reference: Entire home/apt),Raw,Entire home/apt (11777); Private room (4172); Hotel room (228); Shared room (126)
+shared_bath,Categorical (binary),Independent,Whether the bathroom is shared (reference: No),Derived from 'bathrooms_text',No (15645); Yes (658)

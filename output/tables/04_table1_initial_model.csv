@@ -1,0 +1,17 @@
+term,estimate,std_error,t_value,p_value,significance,p_report
+(Intercept),254.3138,110.67,2.298,0.02157739967665734,significant,0.022
+accommodates,373.9707,22.0286,16.977,4.349309629870834e-64,significant,< 0.001
+bedrooms,1267.0777,54.9276,23.068,6.909913545898602e-116,significant,< 0.001
+bathrooms,1379.347,66.3112,20.801,7.208113993379096e-95,significant,< 0.001
+number_of_reviews,-4.2586,0.462,-9.217,3.422839858619357e-20,significant,< 0.001
+availability_365,1.3592,0.2734,4.972,6.707504860449723e-7,significant,< 0.001
+host_is_superhostYes,1054.2749,59.6567,17.672,3.0301048894692855e-69,significant,< 0.001
+shared_bathYes,-859.0428,158.8401,-5.408,6.455005050612772e-8,significant,< 0.001
+room_typePrivate room,-119.1011,70.1735,-1.697,0.08967059561846678,not significant,0.090
+room_typeHotel room,4455.7499,233.2566,19.102,1.827339913968904e-80,significant,< 0.001
+room_typeShared room,482.3687,349.0935,1.382,0.16705969715180125,not significant,0.167
+"room_type as a whole (Anova F, df = 3)",128.3296,NA,NA,3.663885382832989e-82,significant,< 0.001
+"F-statistic (df = 10, 16292)",972.2129,NA,NA,0,significant,< 0.001
+R-squared,0.3737,NA,NA,NA,NA,NA
+Adjusted R-squared,0.3733,NA,NA,NA,NA,NA
+Number of observations,16303,NA,NA,NA,NA,NA

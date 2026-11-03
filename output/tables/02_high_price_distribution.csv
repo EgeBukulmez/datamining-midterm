@@ -1,0 +1,3 @@
+high_price,label,n,percent
+0,0 = Low/medium price (reference),8162,50.06
+1,1 = High price (target),8141,49.94

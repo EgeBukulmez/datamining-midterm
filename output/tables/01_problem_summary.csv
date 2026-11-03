@@ -1,0 +1,24 @@
+problem,variable,n_rows,example
+Incorrect type: number stored as text ($ and comma),price,24553,"$4,736.32"
+"Incorrect type: completely empty column (read as logical, all NA)","13 columns, e.g. bathrooms, instant_bookable, host_since",27232,(all values empty)
+Incorrect type: number of baths only inside text,bathrooms_text,27121,1.5 shared baths
+Missing value,price,2679,(empty cell)
+Missing value (listings with 0 reviews),review_scores_rating,9661,(empty cell)
+Missing value (listings with 0 reviews),reviews_per_month,9661,(empty cell)
+Missing value,beds,413,(empty cell)
+Missing value,bathrooms_text,111,(empty cell)
+Missing value,bedrooms,23,(empty cell)
+Inconsistent category: bath text without a number,bathrooms_text,157,Half-bath / No bathroom / Private half-bath / Shared half-bath
+Rare categories,room_type,430,"Hotel room (272), Shared room (158)"
+Too many categories (39 districts),neighbourhood_cleansed,27232,Beyoglu 7447 ... smallest districts < 20
+Too many / very small categories,property_type,440,88 levels
+Mixed free-text formats,license,17703,34-1476 / Exempt / Non-real estate listing
+Extreme value (above Q3 + 1.5*IQR),price,1656,4989148.47
+Suspicious frequent value (likely monthly rentals),minimum_nights,9087,100
+Extreme value (more than 365 nights),minimum_nights,14,1000
+Extreme value,bedrooms / beds,37,"bedrooms max 50, beds max 67"
+Invalid value (scale is 1-5),review_scores_rating,1,0
+Implausible: more bedrooms than guests,bedrooms vs accommodates,241,"5 bedrooms, 2 guests"
+Implausible: more than 2 beds per guest,beds vs accommodates,177,"8 beds, 2 guests"
+Above Airbnb limit (1125),maximum_nights,5,7000
+Implausible: entire home with 0 baths,bathrooms_text,89,"Entire home/apt, 0 baths"

@@ -1,0 +1,5 @@
+model,HL_chisq,HL_df,HL_p,HL_note,McFadden,CoxSnell,Nagelkerke,TN,FP,FN,TP,accuracy,HL_p_report
+Model 1: accommodates,37.1355,4,1.689162784090925e-7,Only 6 of 10 groups could be formed (ties in predicted probabilities); df = 4,0.1803,0.2211,0.2948,6361,1801,2866,5275,0.7137,< 0.001
+Model 2: host_is_superhost,NA,NA,NA,"Not applicable: only 2 distinct predicted probabilities (categorical predictor only, saturated model); 10 groups cannot be formed and observed = expected by construction",0.0333,0.0451,0.0602,6243,1919,4584,3557,0.6011,NA
+Model 3: room_type,NA,NA,NA,"Not applicable: only 4 distinct predicted probabilities (categorical predictor only, saturated model); 10 groups cannot be formed and observed = expected by construction",0.0541,0.0723,0.0964,3118,5044,1180,6961,0.6182,NA
+Model 4: mixed predictors,64.9989,8,4.828515365318253e-11,10 groups formed as requested,0.2344,0.2774,0.3699,6660,1502,2599,5542,0.7485,< 0.001

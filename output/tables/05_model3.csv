@@ -1,0 +1,5 @@
+term,B,std_error,z_value,p_value,exp_B,p_report,significance
+(Intercept),0.318362,0.018663,17.058,3.0452287745107584e-65,1.3749,< 0.001,significant
+room_typePrivate room,-1.274936,0.03929,-32.45,5.455593260692876e-231,0.2794,< 0.001,significant
+room_typeHotel room,0.201831,0.138225,1.46,0.14424352585500608,1.2236,0.144,not significant
+room_typeShared room,-1.871711,0.235411,-7.951,1.8527164077217615e-15,0.1539,< 0.001,significant

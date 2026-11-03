@@ -1,0 +1,6 @@
+term,estimate,std_error,t_value,p_value,p_report
+(Intercept),1789.3017,56.3794,31.737,1.540987187960172e-214,< 0.001
+accommodates,1049.311,13.084,80.198,0,< 0.001
+"F-statistic (df = 1, 16301)",6431.7441,NA,NA,0,< 0.001
+R-squared,0.2829,NA,NA,NA,NA
+Adjusted R-squared,0.2829,NA,NA,NA,NA

@@ -1,0 +1,3 @@
+term,B,std_error,z_value,p_value,exp_B,p_report,significance
+(Intercept),-0.308889,0.019451,-15.881,8.633647215939976e-57,0.7343,< 0.001,significant
+host_is_superhostYes,0.926002,0.034359,26.95,5.6343140647715705e-160,2.5244,< 0.001,significant

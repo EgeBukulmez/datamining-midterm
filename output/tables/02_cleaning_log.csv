@@ -1,0 +1,9 @@
+step,rows_before,rows_after,rows_removed
+Step 1: select variables (columns only),27232,27232,0
+Step 3: remove missing price,27232,24553,2679
+Step 4: remove price outside 1%-99% percentiles,24553,24065,488
+Step 5: remove minimum_nights > 30,24065,16493,7572
+Step 7a: remove bedrooms > accommodates,16493,16454,39
+Step 7b: remove Entire home/apt with 0 bathrooms,16454,16399,55
+Step 7c: remove bathrooms > accommodates,16399,16371,28
+Step 8: remove missing bedrooms / bathrooms,16371,16303,68
