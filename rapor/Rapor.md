@@ -22,16 +22,13 @@
 ]
 ```
 
-
 # 1. Giriş
 
-Kısa dönem konaklama platformlarında bir ilanın gecelik fiyatı; mekânın büyüklüğü, kiralanan alanın türü ve ev sahibinin platformdaki itibarı gibi pek çok özelliğe bağlıdır. Bu projede, Inside Airbnb tarafından yayımlanan İstanbul ilan verisi (Inside Airbnb, 2026) kullanılarak gecelik fiyatı etkileyen faktörler incelenmiştir.
+Kısa dönem konaklama platformlarında bir ilanın gecelik fiyatı; mekânın büyüklüğüne, kiralanan alanın türüne ve ev sahibinin platformdaki itibarına göre değişir. Bu projede Inside Airbnb'nin yayımladığı İstanbul ilan verisiyle (Inside Airbnb, 2026) gecelik fiyatı etkileyen faktörler incelenmiştir.
 
-Projenin amacı, gerçek bir veri seti üzerinde veri ön işleme, doğrusal regresyon ve ikili lojistik regresyon tekniklerini RStudio ortamında, R programlama dili (R Core Team, 2024) ile uygulamaktır. Çalışma üç ana aşamadan oluşmaktadır:
+Projenin amacı, gerçek bir veri seti üzerinde veri ön işleme, doğrusal regresyon ve ikili lojistik regresyonu RStudio'da, R programlama diliyle (R Core Team, 2024) uygulamaktır.
 
-1. **Veri aktarımı, keşfi ve ön işleme:** Ham verideki tip hataları, eksik değerler, tutarsız kategoriler, uç değerler ve olası veri giriş hataları tespit edilmiş ve gerekçeli kararlarla giderilmiştir.
-2. **Doğrusal regresyon:** Sayısal bağımlı değişken olan gecelik fiyat (`price`, TL), önce tek bir sayısal değişkenle (basit doğrusal regresyon), ardından sayısal ve kategorik değişkenlerin birlikte yer aldığı bir modelle (çoklu doğrusal regresyon) açıklanmıştır.
-3. **İkili lojistik regresyon:** Fiyat, medyan eşiğine göre "yüksek fiyatlı" ve "düşük/orta fiyatlı" olarak ikiye ayrılmış; bir ilanın yüksek fiyatlı olma odds'u dört farklı lojistik modelle incelenmiş ve bu modellerin uyumu ile sınıflandırma başarısı değerlendirilmiştir.
+İlk aşamada ham verideki tip hataları, eksik değerler, tutarsız kategoriler, uç değerler ve olası veri giriş hataları tespit edilmiş ve her biri gerekçeli bir kararla giderilmiştir. İkinci aşamada sayısal bağımlı değişken olan gecelik fiyat (`price`, TL) önce tek bir sayısal değişkenle (basit doğrusal regresyon), sonra sayısal ve kategorik değişkenleri birlikte içeren bir modelle (çoklu doğrusal regresyon) açıklanmıştır. Üçüncü aşamada fiyat, medyan eşiğine göre "yüksek fiyatlı" ve "düşük/orta fiyatlı" olarak ikiye ayrılmıştır. Bir ilanın yüksek fiyatlı olma odds'u dört lojistik modelle incelenmiş, modellerin uyumu ve sınıflandırma başarısı değerlendirilmiştir.
 
 Bütün analizlerde aynı temizlenmiş veri seti ve aynı temel bağımlı değişken (`price`) kullanılmıştır. Lojistik regresyonda kullanılan ikili değişken, doğrusal regresyondaki sayısal fiyattan türetilmiştir.
 
@@ -39,17 +36,13 @@ Bütün analizlerde aynı temizlenmiş veri seti ve aynı temel bağımlı deği
 
 ## 2.1. Veri kaynağı
 
-- **Veri seti:** Inside Airbnb – Istanbul, Marmara, Turkey; "Detailed Listings data" (`listings.csv.gz`).
-- **Tarih:** 25 Eylül 2026 tarihli veri yayını (veri toplama: 28–29 Eylül 2026).
-- **Kaynak:** Inside Airbnb (2026), <https://insideairbnb.com/get-the-data/>. Veri, Creative Commons lisansı ile paylaşılmaktadır.
-- Her satır, İstanbul'daki bir Airbnb ilanını temsil etmektedir.
+Çalışmada Inside Airbnb'nin İstanbul (Marmara, Turkey) için yayımladığı "Detailed Listings data" dosyası (`listings.csv.gz`) kullanılmıştır. Dosya 25 Eylül 2026 tarihli veri yayınına aittir; veriler 28–29 Eylül 2026'da toplanmıştır. Veri <https://insideairbnb.com/get-the-data/> adresinde Creative Commons lisansıyla paylaşılmaktadır (Inside Airbnb, 2026). Her satır İstanbul'daki bir Airbnb ilanıdır.
 
 ## 2.2. Gözlem ve değişken sayısı
 
-- **Ham veri:** 27.232 gözlem (ilan) ve 90 değişken.
-- **Temizlenmiş veri:** 16.303 gözlem ve 10 değişken. Bu sayıya ham veriden analizde kullanılmayan sütunlar çıkarılarak ve Bölüm 3.3'te açıklanan satır filtreleri uygulanarak ulaşılmıştır.
+Ham veride 27.232 gözlem (ilan) ve 90 değişken vardır. Analizde kullanılmayan sütunlar çıkarılıp Bölüm 3.3'teki satır filtreleri uygulandıktan sonra temiz veride 16.303 gözlem ve 10 değişken kalmıştır.
 
-Temiz veri seti yönergenin 1.1 maddesindeki bütün şartları karşılamaktadır:
+Temiz veri seti yönergenin 1.1 maddesindeki bütün şartları karşılar:
 
 - En az 100 gözlem: 16.303 gözlem.
 - En az 4 sayısal değişken: 6 sayısal değişken (`price`, `accommodates`, `bedrooms`, `bathrooms`, `number_of_reviews`, `availability_365`).
@@ -59,7 +52,7 @@ Temiz veri seti yönergenin 1.1 maddesindeki bütün şartları karşılamaktad�
 
 ## 2.3. Değişken açıklama tablosu
 
-Temizlenmiş veri setindeki değişkenlerin türleri, analizdeki rolleri, kaynakları ve değer aralıkları Tablo 1'de özetlenmiştir. Tablo 1'de görüldüğü gibi veri seti iki bağımlı değişken, beş sayısal ve üç kategorik bağımsız değişkenden oluşmaktadır.
+Tablo 1, temizlenmiş veri setindeki değişkenlerin türünü, analizdeki rolünü, kaynağını ve değer aralığını gösterir. Veri setinde iki bağımlı değişken, beş sayısal ve üç kategorik bağımsız değişken vardır.
 
 Table: Tablo 1. Temizlenmiş veri setindeki değişkenler
 
@@ -78,12 +71,7 @@ Table: Tablo 1. Temizlenmiş veri setindeki değişkenler
 
 ## 2.4. Sayısal bağımlı değişken
 
-Doğrusal regresyonun bağımlı değişkeni, ilanın gecelik fiyatı olan `price` değişkenidir. Ham veride bu değişken `"$4,736.32"` biçiminde metin olarak saklanmaktadır. Değerlerin önünde `$` işareti bulunsa da birim Türk Lirasıdır. Temizlenmiş veride fiyatın:
-
-- minimumu 542 TL ve maksimumu 38.286 TL,
-- medyanı 4.457,5 TL ve ortalaması 5.679,73 TL'dir.
-
-Ortalamanın medyandan büyük olması, dağılımın sağa çarpık olduğunu göstermektedir.
+Doğrusal regresyonun bağımlı değişkeni ilanın gecelik fiyatı olan `price` değişkenidir. Ham veride bu değişken `"$4,736.32"` biçiminde metin olarak saklanır. Değerlerin önünde `$` işareti olsa da birim Türk Lirasıdır. Temizlenmiş veride fiyat 542 TL ile 38.286 TL arasındadır; medyanı 4.457,5 TL, ortalaması 5.679,73 TL'dir. Ortalamanın medyandan büyük olması dağılımın sağa çarpık olduğunu gösterir.
 
 ## 2.5. İkili bağımlı değişkenin oluşturulması
 
@@ -91,13 +79,9 @@ Lojistik regresyon için `price` değişkeninden `high_price` adlı ikili bir de
 
 $$high\_price = \begin{cases} 1 & \text{price} > 4457{,}5 \text{ TL (hedef sonuç: yüksek fiyat)} \\ 0 & \text{price} \le 4457{,}5 \text{ TL (referans sonuç: düşük/orta fiyat)} \end{cases}$$
 
-**Eşiğin gerekçesi.** Sınıflandırma eşiği olarak temizlenmiş verideki fiyat medyanı (4.457,5 TL) seçilmiştir. Bu seçimin üç gerekçesi vardır:
+**Eşiğin gerekçesi.** Eşik olarak temizlenmiş verideki fiyat medyanı (4.457,5 TL) seçilmiştir. Medyan veriyi neredeyse eşit iki gruba ayırır; böylece bir sınıfın baskın olması sınıflandırma başarısını yanıltıcı biçimde yükseltmez. Fiyat dağılımı sağa çarpık olduğu için ortalama (5.679,73 TL) uç değerlerden etkilenir, medyan ise etkilenmez. Ayrıca medyan doğrudan veriden hesaplanır ve araştırmacının keyfi olarak seçtiği bir TL değerine dayanmaz. Yönerge de medyanı kabul edilebilir eşikler arasında sayar.
 
-- **Dengeli sınıflar:** Medyan, veriyi neredeyse eşit iki gruba ayırır. Böylece bir sınıfın baskın olmasından kaynaklanan yanıltıcı sınıflandırma başarısının önüne geçilir.
-- **Uç değerlere dayanıklılık:** Fiyat dağılımı sağa çarpık olduğundan ortalama (5.679,73 TL) uç değerlerden etkilenir; medyan ise etkilenmez.
-- **Nesnellik:** Medyan, keyfi bir TL değerine dayanmayan, veriden nesnel olarak elde edilen bir eşiktir. Yönerge de medyanı kabul edilebilir eşikler arasında saymaktadır.
-
-Böylece `high_price = 1`, ilgili ilanın İstanbul'daki kısa dönem ilanlarının fiyat bakımından üst yarısında yer aldığı anlamına gelmektedir. Eşik, bütün temizleme adımları tamamlandıktan sonra son veri üzerinden hesaplanmıştır. Oluşturulan değişkenin sınıf dağılımı Tablo 2'de verilmiştir.
+`high_price = 1` olan bir ilan, İstanbul'daki kısa dönem ilanları arasında fiyat bakımından üst yarıdadır. Eşik, bütün temizleme adımları bittikten sonra son veri üzerinden hesaplanmıştır. Sınıf dağılımı Tablo 2'dedir.
 
 Table: Tablo 2. İkili bağımlı değişkenin (high_price) dağılımı
 
@@ -107,13 +91,13 @@ Table: Tablo 2. İkili bağımlı değişkenin (high_price) dağılımı
 | 1 | Yüksek fiyat (hedef) | 8.141 | %49,94 |
 | **Toplam** | | **16.303** | **%100** |
 
-Tablo 2'de görüldüğü gibi iki sınıf neredeyse eşit büyüklüktedir. Değişkenin doğru oluşturulduğu üç kontrolle doğrulanmıştır:
+İki sınıf neredeyse eşit büyüklüktedir. Değişkenin doğru oluşturulduğu üç kontrolle doğrulanmıştır:
 
-- 0 grubundaki fiyatlar 542 – 4.457,5 TL, 1 grubundaki fiyatlar 4.458 – 38.286,33 TL aralığındadır. Yani 0 grubunun en yüksek fiyatı medyanı aşmamakta, 1 grubunun en düşük fiyatı ise medyanın üzerindedir.
+- 0 grubundaki fiyatlar 542 – 4.457,5 TL, 1 grubundaki fiyatlar 4.458 – 38.286,33 TL aralığındadır. 0 grubunun en yüksek fiyatı medyanı aşmaz, 1 grubunun en düşük fiyatı ise medyanın üzerindedir.
 - Değişken yalnızca 0 ve 1 değerlerini almaktadır ve eksik değer içermemektedir.
 - Kural bağımsız olarak yeniden hesaplandığında bütün satırlarda aynı sonuç elde edilmiştir.
 
-Gruplar tam olarak %50'ye %50 değildir. Bunun nedeni, fiyatı tam medyana eşit olan 11 ilanın "büyüktür" kuralı gereği 0 grubuna düşmesidir. Orijinal `price` değişkeni, kendi ikili dönüşümünü tahmin etmek için hiçbir lojistik modelde bağımsız değişken olarak kullanılmamıştır.
+Gruplar tam %50'ye %50 değildir, çünkü fiyatı tam medyana eşit olan 11 ilan "büyüktür" kuralı gereği 0 grubuna düşmüştür. Orijinal `price` değişkeni, kendi ikili dönüşümünü tahmin etmek için hiçbir lojistik modelde bağımsız değişken olarak kullanılmamıştır.
 
 ```r
 price_median <- median(df$price)
@@ -124,7 +108,7 @@ df <- df %>% mutate(high_price = if_else(price > price_median, 1L, 0L))
 
 ## 3.1. Verinin RStudio'ya aktarılması
 
-Ham veri dosyası, gzip ile sıkıştırılmış bir CSV (virgülle ayrılmış değerler) dosyasıdır (`.csv.gz`). Dosya, tidyverse paket koleksiyonundaki (Wickham et al., 2019) `readr` paketinin `read_csv()` fonksiyonuyla doğrudan, önceden açılmasına gerek kalmadan okunmuştur. Sütun tiplerinin güvenilir biçimde tahmin edilmesi için fonksiyonun bütün satırlara bakması sağlanmıştır (`guess_max = 30000`). Okuma sırasında hiçbir ayrıştırma (parsing) hatası oluşmamıştır.
+Ham veri dosyası, gzip ile sıkıştırılmış bir CSV (virgülle ayrılmış değerler) dosyasıdır (`.csv.gz`). Dosya, tidyverse paket koleksiyonundaki (Wickham et al., 2019) `readr` paketinin `read_csv()` fonksiyonuyla önceden açılmadan doğrudan okunmuştur. Sütun tiplerini güvenilir biçimde tahmin edebilmesi için fonksiyona bütün satırlara bakması söylenmiştir (`guess_max = 30000`). Okuma sırasında hiçbir ayrıştırma (parsing) hatası oluşmamıştır.
 
 ```r
 library(tidyverse)
@@ -132,21 +116,18 @@ listings <- read_csv("data/listings.csv.gz", guess_max = 30000, show_col_types =
 dim(listings)   # 27232 90
 ```
 
-- **Dosya formatı:** CSV, gzip ile sıkıştırılmış (`.csv.gz`).
-- **Kullanılan R fonksiyonu:** `readr::read_csv()`.
-- **Gözlem sayısı:** 27.232.
-- **Değişken sayısı:** 90.
+Dosya formatı gzip ile sıkıştırılmış CSV (`.csv.gz`), kullanılan R fonksiyonu `readr::read_csv()`'dir. Veride 27.232 gözlem ve 90 değişken vardır.
 
 ## 3.2. İlk inceleme ve tespit edilen sorunlar
 
 Veri seti önce `head()`, `dim()`, `str()` ve `summary()` fonksiyonlarıyla incelenmiştir:
 
-- **`head()`:** Her satırın bir ilan olduğu ve `price` değişkeninin `"$4,736.32"` gibi metin olarak saklandığı görülmüştür.
-- **`dim()`:** Verinin 27.232 satır ve 90 sütundan oluştuğunu doğrulamıştır.
-- **`str()`:** 47 sayısal, 20 metin (character), 17 mantıksal (logical) ve 6 tarih (Date) tipinde değişken bulunduğunu göstermiştir.
-- **`summary()`:** Sayısal değişkenlerin dağılımını ve eksik değer sayılarını ortaya koymuştur.
+- `head()`: Her satırın bir ilan olduğunu ve `price` değişkeninin `"$4,736.32"` gibi metin olarak saklandığını göstermiştir.
+- `dim()`: Verinin 27.232 satır ve 90 sütundan oluştuğunu doğrulamıştır.
+- `str()`: 47 sayısal, 20 metin (character), 17 mantıksal (logical) ve 6 tarih (Date) tipinde değişken bulunduğunu göstermiştir.
+- `summary()`: Sayısal değişkenlerin dağılımını ve eksik değer sayılarını ortaya koymuştur.
 
-Bu incelemelerle bulunan sorunlar Tablo 3'te özetlenmiştir.
+Bulunan sorunlar Tablo 3'te özetlenmiştir.
 
 Table: Tablo 3. İlk incelemede tespit edilen veri sorunları
 
@@ -176,32 +157,30 @@ Table: Tablo 3. İlk incelemede tespit edilen veri sorunları
 | Giriş hatası | Airbnb üst sınırının (1.125) aşılması | maximum_​nights | 5 | 7.000 |
 | Giriş hatası | Bütün ev/daire olup 0 banyo | bathrooms_​text | 89 | Entire home/apt, 0 baths |
 
-Tespit edilen sorunların ayrıntıları şunlardır:
-
 **Yanlış veri tipleri**
 
 - `price` metin olarak saklandığından sayısal işlemlerde kullanılamamaktadır.
-- 13 sütun tamamen boştur. `read_csv()` bu sütunların tipini tahmin edemediği için onları mantıksal (logical) tipte okumuştur.
+- 13 sütun tamamen boştur. `read_csv()` bu sütunların tipini tahmin edemediği için onları mantıksal (logical) okumuştur.
 - Banyo sayısı, sayısal bir sütun yerine yalnızca `"1.5 shared baths"` gibi metinlerde yer almaktadır.
-- `host_is_superhost` değişkeni ham dosyada `t`/`f` olarak yazılıdır; `read_csv()` bu değişkeni doğrudan mantıksal tipe çevirmiş olduğundan burada bir tip sorunu yoktur.
+- `host_is_superhost` değişkeni ham dosyada `t`/`f` olarak yazılıdır. `read_csv()` onu doğrudan mantıksal tipe çevirdiği için burada tip sorunu yoktur.
 
 **Eksik değerler**
 
 - Eksik fiyatlar bağımlı değişkende yer aldığından ilgili ilanlar regresyonda kullanılamaz.
-- Eksik puanların (9.661) tamamı hiç yorum almamış (`number_of_reviews = 0`) ilanlara aittir. Dolayısıyla bu eksiklik bir veri hatası değil, yapısal bir eksikliktir.
+- Eksik puanların (9.661) tamamı hiç yorum almamış (`number_of_reviews = 0`) ilanlara aittir. Puanın boş olmasının nedeni yorum bulunmamasıdır, yani bu eksiklik yapısaldır.
 
 **Olağandışı sayısal değerler**
 
 - Fiyat dağılımı aşırı sağa çarpıktır: medyan 3.710 TL, %99'luk dilim 38.317,80 TL, maksimum ise yaklaşık 4,99 milyon TL'dir.
-- `minimum_nights` değişkeninde 100 değeri en sık görülen ikinci değerdir (9.087 ilan). Bu yığılma, verinin önemli bir kısmının aylık/uzun dönem kiralık ilanlardan oluştuğuna işaret etmektedir.
+- `minimum_nights` değişkeninde 100 değeri en sık görülen ikinci değerdir (9.087 ilan). Bu yığılma, verinin önemli bir kısmının aylık/uzun dönem kiralık ilan olduğunu düşündürür.
 
 **Olası veri giriş hataları**
 
-- Misafir sayısından fazla yatak odası bulunan ilanlar ve banyosuz "bütün ev/daire" ilanları mantıksal olarak tutarsızdır. Bu nedenle olası veri giriş hatası olarak değerlendirilmiştir.
+- Misafir sayısından fazla yatak odası olan ilanlar ve banyosuz "bütün ev/daire" ilanları mantıksal olarak tutarsız olduğu için olası veri giriş hatası sayılmıştır.
 
 ## 3.3. Veri temizleme ve hazırlama
 
-Ham dosya hiçbir aşamada değiştirilmemiştir; bütün düzeltmeler R kodu içinde yapılmıştır. Uygulanan adımlar ve her adımdan önceki ve sonraki satır sayıları Tablo 4'te verilmiştir.
+Ham dosya hiçbir aşamada değiştirilmemiş, bütün düzeltmeler R kodu içinde yapılmıştır. Uygulanan adımlar ve her adımdan önceki ve sonraki satır sayıları Tablo 4'tedir.
 
 Table: Tablo 4. Temizleme adımları ve satır sayıları
 
@@ -219,47 +198,43 @@ Table: Tablo 4. Temizleme adımları ve satır sayıları
 | 8 | Eksik bedrooms / bathrooms içeren satırları çıkarma | 16.371 | 16.303 | 68 |
 | 9 | Kategorik değişkenleri factor'e çevirme ve referansları belirleme | – | – | – |
 
-Sonuç olarak ham verinin %59,9'u (16.303 ilan) analizde kullanılmıştır. Her adımın gerekçesi aşağıda açıklanmıştır.
+Sonuçta ham verinin %59,9'u (16.303 ilan) analizde kullanılmıştır.
 
-**Adım 1 – Değişken seçimi.** Analizde kullanılacak değişkenler tutulmuş, diğerleri çıkarılmıştır. Çıkarılan sütunlar arasında URL'ler, serbest metinler, 13 tamamen boş sütun, lisans bilgisi ve puan alt boyutları yer almaktadır.
+**Adım 1: Değişken seçimi.** Analizde kullanılacak değişkenler tutulmuş, diğerleri çıkarılmıştır. Çıkarılan sütunlar arasında URL'ler, serbest metinler, 13 tamamen boş sütun, lisans bilgisi ve puan alt boyutları yer almaktadır.
 
 - `minimum_nights` Adım 5'teki filtre için, `bathrooms_text` ise Adım 6'daki dönüşüm için geçici olarak tutulmuştur.
 - Bu seçimle Tablo 3'teki bazı sorunlar kendiliğinden ortadan kalkmıştır, çünkü ilgili değişkenler analizde kullanılmamaktadır: boş sütunlar, `beds` değişkenindeki eksik ve uç değerler, `maximum_nights` sınır aşımı, `property_type` ve `license` karmaşası.
-- **Puan değişkeninin kullanılmaması:** `review_scores_rating` modele alınmamıştır. İlanların %35,5'inde (9.661 ilan) eksik olan bu değişken kullanılsaydı, hiç yorum almamış ilanların tamamının analiz dışında kalması gerekecekti. Eksik puanları doldurmak ise "yorum almamış ilanın puanı olmaz" gerçeğiyle çelişen yapay değerler üretecekti. Bu değişkenin çıkarılmasıyla tek geçersiz puan değeri (0) sorunu da ortadan kalkmıştır.
+- `review_scores_rating` modele alınmamıştır. İlanların %35,5'inde (9.661 ilan) eksik olan bu değişken kullanılsaydı, hiç yorum almamış ilanların tamamının analiz dışında kalması gerekecekti. Eksik puanları doldurmak ise "yorum almamış ilanın puanı olmaz" gerçeğiyle çelişen yapay değerler üretecekti. Değişken çıkarılınca tek geçersiz puan değeri (0) sorunu da ortadan kalkmıştır.
 
-**Adım 2 – Tip dönüşümü.** `price` değişkeni `parse_number()` fonksiyonuyla sayıya çevrilmiştir. Fonksiyon `$` işaretini ve binlik ayıracı kaldırmaktadır (`"$4,736.32"` → 4736,32).
+**Adım 2: Tip dönüşümü.** `price` değişkeni `parse_number()` fonksiyonuyla sayıya çevrilmiştir. Fonksiyon `$` işaretini ve binlik ayıracı kaldırmaktadır (`"$4,736.32"` → 4736,32).
 
-**Adım 3 – Eksik fiyatlar.** Fiyatı eksik 2.679 ilan çıkarılmıştır. Bağımlı değişkenin ortalama veya medyan gibi bir değerle doldurulması yapay veri üreteceğinden silme tercih edilmiştir.
+**Adım 3: Eksik fiyatlar.** Fiyatı eksik 2.679 ilan çıkarılmıştır. Bağımlı değişkeni ortalama veya medyan gibi bir değerle doldurmak yapay veri üreteceği için bu ilanlar silinmiştir.
 
-**Adım 4 – Fiyat uç değerleri.** Eksik fiyatlar çıkarıldıktan sonra fiyatın %1 persentili (417,28 TL) ve %99 persentili (38.317,80 TL) hesaplanmış; bu aralığın dışında kalan 488 ilan çıkarılmıştır.
+**Adım 4: Fiyat uç değerleri.** Eksik fiyatlar çıkarıldıktan sonra fiyatın %1 persentili (417,28 TL) ve %99 persentili (38.317,80 TL) hesaplanmış; bu aralığın dışında kalan 488 ilan çıkarılmıştır.
 
 - Doğrusal regresyonda kullanılan en küçük kareler yöntemi uç değerlere çok duyarlıdır. Milyonlarca TL'lik birkaç değer, regresyon doğrusunu kendine doğru çekerek katsayıları yanıltıcı hâle getirebilir.
-- Persentile dayalı bir kural, keyfi bir TL sınırı yerine dağılımın kendisine dayanan, her iki uçtaki aşırı değerleri simetrik biçimde ayıklayan nesnel bir yöntemdir.
+- Persentil kuralı sınırı dağılımın kendisinden alır ve iki uçtaki aşırı değerleri simetrik biçimde ayıklar. Bu yüzden keyfi bir TL sınırından daha nesneldir.
 
-**Adım 5 – Uzun dönem kiralıklar.** En az 30 gecelik konaklama şartı koyan (`minimum_nights > 30`) 7.572 ilan çıkarılmış, ardından `minimum_nights` değişkeni de veriden silinmiştir.
+**Adım 5: Uzun dönem kiralıklar.** 30 geceden uzun konaklama şartı koyan (`minimum_nights > 30`) 7.572 ilan çıkarılmış, ardından `minimum_nights` değişkeni de veriden silinmiştir. Bu ilanlar fiilen aylık ya da uzun dönem kiralıktır ve "gecelik fiyatları" kısa dönem konaklama ilanlarıyla karşılaştırılamaz. Bu adım, ilk incelemede görülen 100 gecelik yığılmayı da temizlemiştir. Analiz böylece en fazla 30 gecelik konaklama şartı olan kısa dönem ilanlarla sınırlanmıştır.
 
-- Bu ilanlar fiilen aylık/uzun dönem kiralıktır; "gecelik fiyatları" kısa dönem konaklama ilanlarıyla karşılaştırılabilir değildir.
-- Bu adımla, ilk incelemede görülen 100 gecelik yığılma da temizlenmiştir.
-- Analizin kapsamı böylece 30 gece ve altı kısa dönem konaklama ilanlarıyla sınırlanmıştır.
+**Adım 6: Yeni değişkenler.** `bathrooms_text` metninden iki yeni değişken türetilmiştir.
 
-**Adım 6 – Yeni değişkenler.** `bathrooms_text` metninden iki yeni değişken türetilmiştir.
-
-- **`bathrooms` (sayısal):**
+- `bathrooms` (sayısal):
   - Metinde bir sayı varsa o sayı alınmıştır ("1.5 shared baths" → 1,5).
   - Sayı içermeyen "Half-bath", "Private half-bath" ve "Shared half-bath" değerleri 0,5 olarak kodlanmıştır.
   - "No bathroom" değeri 0 olarak kodlanmıştır; bu değere sahip ilanlar önceki adımlarda zaten çıkmıştır.
-- **`shared_bath` (iki kategorili):** Metinde "shared" ifadesi geçiyorsa "Yes", geçmiyorsa "No" değerini almıştır. Bu değişken, yönergenin istediği üçüncü kategorik değişkendir.
+- `shared_bath` (iki kategorili): Metinde "shared" ifadesi geçiyorsa "Yes", geçmiyorsa "No" değerini almıştır. Bu değişken, yönergenin istediği üçüncü kategorik değişkendir.
 
-**Adım 7 – Veri giriş hataları.** Mantıksal olarak tutarsız üç durum veri giriş hatası kabul edilmiştir.
+**Adım 7: Veri giriş hataları.** Mantıksal olarak tutarsız üç durum veri giriş hatası kabul edilmiştir.
 
-- **7a:** Misafir sayısından fazla yatak odası bulunan 39 ilan çıkarılmıştır (ör. 2 misafirlik 5 yatak odası).
-- **7b:** Bütün bir evin veya dairenin banyosuz olması mümkün olmadığından banyo sayısı 0 olan 55 "Entire home/apt" ilanı çıkarılmıştır.
-- **7c:** Aynı mantıkla banyo sayısı misafir sayısını aşan 28 ilan çıkarılmıştır. Bu ilanlarda, örneğin 2 kişilik bir özel oda için 34 banyo gibi değerlerin bir otel veya hostel binasının toplam banyo sayısının tek bir ilana yazılmasından kaynaklandığı düşünülmektedir. Bu kuraldan sonra banyo sayısının maksimumu 15'e inmiştir.
-- **Oda ilanlarında 0 banyo:** Banyo sayısı 0 olan oda ilanları (Private, Shared, Hotel room) veride tutulmuştur. Bu ilanlarda 0 değeri, odaya ait bir banyo bulunmadığını ve ortak bir banyonun kullanıldığını ifade eder; yani bir veri hatası değildir. 0 banyo yalnızca "Entire home/apt" ilanlarında hata kabul edilmiştir.
+- 7a: Misafir sayısından fazla yatak odası bulunan 39 ilan çıkarılmıştır (ör. 2 misafirlik 5 yatak odası).
+- 7b: Bütün bir evin veya dairenin banyosuz olması mümkün olmadığından banyo sayısı 0 olan 55 "Entire home/apt" ilanı çıkarılmıştır.
+- 7c: Aynı mantıkla banyo sayısı misafir sayısını aşan 28 ilan çıkarılmıştır. Bu ilanlarda, örneğin 2 kişilik bir özel oda için 34 banyo gibi değerlerin bir otel veya hostel binasının toplam banyo sayısının tek bir ilana yazılmasından kaynaklandığı düşünülmektedir. Bu kuraldan sonra banyo sayısının maksimumu 15'e inmiştir.
+- Banyo sayısı 0 olan oda ilanları (Private, Shared, Hotel room) veride tutulmuştur. Bu ilanlarda 0, odaya ait banyo olmadığını ve ortak bir banyonun kullanıldığını gösterir. 0 banyo yalnızca "Entire home/apt" ilanlarında hata kabul edilmiştir.
 
-**Adım 8 – Kalan eksik değerler.** `bedrooms` veya `bathrooms` değişkeni eksik olan 68 satır çıkarılmıştır. Bu satırlar örneklemin çok küçük bir bölümünü oluşturduğundan, silme işlemi örneklem büyüklüğünü önemli ölçüde etkilememekte ve yapay değer üretilmesini önlemektedir.
+**Adım 8: Kalan eksik değerler.** `bedrooms` veya `bathrooms` değişkeni eksik olan 68 satır çıkarılmıştır. Bu satırlar örneklemin çok küçük bir bölümü olduğu için silmek örneklem büyüklüğünü pek etkilemez ve yapay değer üretmekten daha uygundur.
 
-**Adım 9 – Kategorik değişkenlerin yeniden kodlanması.** Kategorik değişkenler factor'e çevrilmiş ve her birinin ilk düzeyi referans kategori olarak belirlenmiştir:
+**Adım 9: Kategorik değişkenlerin yeniden kodlanması.** Kategorik değişkenler factor'e çevrilmiş ve her birinin ilk düzeyi referans kategori olarak belirlenmiştir:
 
 - `host_is_superhost`: TRUE/FALSE değerleri "Yes"/"No" olarak yeniden kodlanmıştır; referans kategori "No" (Superhost değil).
 - `room_type`: referans kategori "Entire home/apt". Bu kategori en büyük grup olduğu için seçilmiştir.
@@ -285,8 +260,8 @@ df <- df %>% filter(!is.na(bedrooms), !is.na(bathrooms))          # kalan eksikl
 
 Temizleme ve değişken oluşturma işlemlerinden sonra veri seti `str()`, `summary()` ve `dim()` fonksiyonlarıyla yeniden incelenmiştir.
 
-- **`dim()`:** Son veri seti **16.303 gözlem ve 10 değişkenden** oluşmaktadır ve hiç eksik değer içermemektedir.
-- **`str()`:** Değişken tipleri amaca uygundur. Altı değişken sayısal (numeric), üç değişken factor, `high_price` ise 0/1 değerli tamsayıdır.
+- `dim()`: Son veri seti 16.303 gözlem ve 10 değişkenden oluşur ve hiç eksik değer içermez.
+- `str()`: Değişken tipleri amaca uygundur. Altı değişken sayısal (numeric), üç değişken factor, `high_price` ise 0/1 değerli tamsayıdır.
 
 Sayısal değişkenlerin özet istatistikleri Tablo 5'te verilmiştir.
 
@@ -318,16 +293,7 @@ Bununla birlikte bazı özellikler yorumlarda göz önünde tutulmuştur:
 
 ## 4.1. Basit doğrusal regresyon
 
-**Değişkenler ve seçim gerekçesi.**
-
-- **Bağımlı değişken (Y):** `price` (gecelik fiyat, TL).
-- **Bağımsız değişken (X):** `accommodates` (ilanın ağırlayabileceği en fazla misafir sayısı).
-
-`accommodates` üç nedenle seçilmiştir:
-
-- **Kuramsal beklenti:** Daha fazla misafir ağırlayabilen bir mekânın daha yüksek fiyatlı olması beklenir.
-- **Eksiksizlik:** Değişkende eksik değer yoktur.
-- **Güçlü ilişki:** Fiyatla orta-güçlü pozitif bir doğrusal ilişkisi vardır (r = 0,5319). Medyan fiyat da kapasiteyle düzenli olarak artmaktadır: 1 kişilik ilanlarda 2.040 TL, 2 kişilik ilanlarda 3.100 TL, 4 kişilik ilanlarda 5.016 TL ve 6 kişilik ilanlarda 7.245 TL.
+**Değişkenler ve seçim gerekçesi.** Bağımlı değişken (Y) `price` (gecelik fiyat, TL), bağımsız değişken (X) `accommodates`'tir (ilanın ağırlayabileceği en fazla misafir sayısı). Daha fazla misafir ağırlayabilen bir mekânın daha pahalı olması beklenir. Değişkende eksik değer yoktur ve fiyatla orta-güçlü, pozitif bir doğrusal ilişkisi vardır (r = 0,5319). Medyan fiyat da kapasiteyle düzenli olarak artar: 1 kişilik ilanlarda 2.040 TL, 2 kişilik ilanlarda 3.100 TL, 4 kişilik ilanlarda 5.016 TL ve 6 kişilik ilanlarda 7.245 TL.
 
 Model şu şekildedir:
 
@@ -353,22 +319,19 @@ Table: Tablo 6. Basit doğrusal regresyon sonuçları (Y = price)
 - H₀: Model fiyatı açıklamamaktadır (β₁ = 0).
 - H₁: Model fiyatı açıklamaktadır (β₁ ≠ 0).
 
-F(1; 16.301) = 6.431,74 ve p < 0,001 olduğundan H₀ reddedilmiştir. Model istatistiksel olarak anlamlıdır.
+F(1; 16.301) = 6.431,74 ve p < 0,001 olduğundan H₀ reddedilir; model istatistiksel olarak anlamlıdır.
 
-**Bağımsız değişkenin anlamlılığı.** `accommodates` için t = 80,20 ve p < 0,001 bulunmuştur. Kapasitenin fiyat üzerinde etkisi olmadığını öne süren H₀ reddedilmiştir; `accommodates` anlamlı bir açıklayıcı değişkendir.
+**Bağımsız değişkenin anlamlılığı.** `accommodates` için t = 80,20 ve p < 0,001 bulunmuştur. Kapasitenin fiyata etkisi olmadığını öne süren H₀ reddedilir, yani `accommodates` anlamlı bir açıklayıcı değişkendir.
 
-**Katsayının yorumu.**
-
-- **B₁ = 1.049,31:** İlanın kapasitesi bir kişi arttığında gecelik fiyat ortalama yaklaşık 1.049 TL artmaktadır. Katsayının pozitif işareti kuramsal beklentiyle uyumludur.
-- **Sabit terim (B₀ = 1.789,30):** Kapasitenin 0 olduğu durumdaki tahmini fiyattır. Veride 0 kişilik ilan bulunmadığından pratik bir anlamı yoktur.
+**Katsayının yorumu.** B₁ = 1.049,31'dir: ilanın kapasitesi bir kişi arttığında gecelik fiyat ortalama yaklaşık 1.049 TL artar. Pozitif işaret kuramsal beklentiyle uyumludur. Sabit terim (B₀ = 1.789,30), kapasitenin 0 olduğu durumdaki tahmini fiyattır; veride 0 kişilik ilan olmadığı için pratik bir anlamı yoktur.
 
 **Tahmini regresyon denklemi:**
 
 $$\widehat{price} = 1789{,}30 + 1049{,}31 \times accommodates$$
 
-**R² ve düzeltilmiş R².** R² = 0,2829 değeri, fiyattaki değişkenliğin %28,3'ünün tek başına kişi kapasitesiyle açıklandığını göstermektedir. Kalan değişkenlik modelde yer almayan etkenlerden (ör. konum, oda tipi, mekânın niteliği) kaynaklanmaktadır. Modelde tek bir bağımsız değişken bulunduğu ve gözlem sayısı çok yüksek olduğu için düzeltilmiş R² (0,2829) R² ile neredeyse aynıdır.
+**R² ve düzeltilmiş R².** R² = 0,2829'dur, yani fiyattaki değişkenliğin %28,3'ü tek başına kişi kapasitesiyle açıklanır. Kalan değişkenlik modelde olmayan etkenlerden (ör. konum, oda tipi, mekânın niteliği) gelir. Modelde tek bir bağımsız değişken olduğu ve gözlem sayısı çok yüksek olduğu için düzeltilmiş R² (0,2829) R² ile neredeyse aynıdır.
 
-**Tahmin değerleri.** Model, veri setindeki her ilan için bir tahmini fiyat üretmiştir. Örneğin, gerçek fiyatı 33.791 TL olan 12 kişilik bir ilan için tahmin 14.381,03 TL'dir. Bu örnek, tek değişkenli modelin lüks ve pahalı ilanların fiyatını düşük tahmin ettiğini göstermektedir. Tablo 7'de iki örnek ilan için tahmini fiyatlar verilmiştir.
+**Tahmin değerleri.** Model veri setindeki her ilan için bir tahmini fiyat üretmiştir. Gerçek fiyatı 33.791 TL olan 12 kişilik bir ilan için tahmin 14.381,03 TL'dir; tek değişkenli model lüks ve pahalı ilanların fiyatını düşük tahmin eder. Tablo 7'de iki örnek ilan için tahmini fiyatlar var.
 
 Table: Tablo 7. Basit doğrusal regresyon modeline göre tahmini fiyatlar
 
@@ -377,21 +340,21 @@ Table: Tablo 7. Basit doğrusal regresyon modeline göre tahmini fiyatlar
 | 2 | 3.887,92 |
 | 4 | 5.986,55 |
 
-Örneğin 2 kişilik bir ilanın tahmini fiyatı 1.789,30 + 1.049,31 × 2 = 3.887,92 TL'dir. Bu tahminler gözlenen medyan fiyatlardan (2 kişi 3.100 TL, 4 kişi 5.016 TL) yüksektir. Bunun nedeni, en küçük kareler yönteminin ortalamaya dayalı tahmin üretmesi ve sağa çarpık fiyat dağılımında ortalamanın pahalı ilanlardan etkilenmesidir.
+Örneğin 2 kişilik bir ilanın tahmini fiyatı 1.789,30 + 1.049,31 × 2 = 3.887,92 TL'dir. Bu tahminler gözlenen medyan fiyatlardan (2 kişi 3.100 TL, 4 kişi 5.016 TL) yüksektir, çünkü en küçük kareler yöntemi ortalamaya dayalı tahmin üretir ve sağa çarpık fiyat dağılımında ortalama pahalı ilanlardan etkilenir.
 
-**Bulguların yorumu.** Kişi kapasitesi, gecelik fiyatın istatistiksel olarak anlamlı ve pozitif bir belirleyicisidir. Ancak modelin açıklama gücü orta düzeydedir: fiyattaki değişkenliğin büyük bölümü kapasite dışındaki etkenlere bağlıdır. Bu sonuç, birden fazla değişkenin birlikte kullanıldığı bir modelin gerekliliğine işaret etmektedir.
+**Bulguların yorumu.** Kişi kapasitesi gecelik fiyatın istatistiksel olarak anlamlı ve pozitif bir belirleyicisidir. Ancak modelin açıklama gücü orta düzeydedir ve fiyattaki değişkenliğin büyük bölümü kapasite dışındaki etkenlere bağlıdır. Bu yüzden sonraki bölümde birden fazla değişken birlikte kullanılmıştır.
 
 ## 4.2. Çoklu doğrusal regresyon
 
-### 4.2.1. Step 1 – Başlangıç modeli
+### 4.2.1. Step 1: Başlangıç modeli
 
-Başlangıç modelinde bağımlı değişken `price` olmuştur. Bağımsız değişkenler şunlardır:
+Başlangıç modelinde bağımlı değişken `price`'tır. Bağımsız değişkenler şunlardır:
 
-- **Sayısal (5):** `accommodates`, `bedrooms`, `bathrooms`, `number_of_reviews`, `availability_365`.
-- **İki kategorili (2):** `host_is_superhost` (referans: No) ve `shared_bath` (referans: No).
-- **Üç ve daha fazla kategorili (1):** `room_type` (referans: Entire home/apt).
+- Sayısal (5): `accommodates`, `bedrooms`, `bathrooms`, `number_of_reviews`, `availability_365`.
+- İki kategorili (2): `host_is_superhost` (referans: No) ve `shared_bath` (referans: No).
+- Üç ve daha fazla kategorili (1): `room_type` (referans: Entire home/apt).
 
-Kategorik değişkenler factor'e çevrilmiştir. R, referans dışındaki her kategori için 0/1 değerli bir kukla (dummy) değişken oluşturur. Kukla değişkenlerin katsayıları, ilgili kategorinin referans kategoriye göre farkını gösterir.
+Kategorik değişkenler factor'e çevrilmiştir. R, referans dışındaki her kategori için 0/1 değerli bir kukla (dummy) değişken oluşturur ve kuklanın katsayısı o kategorinin referans kategoriye göre farkını gösterir.
 
 $$price = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_{10} X_{10} + \varepsilon$$
 
@@ -417,27 +380,24 @@ Table: Tablo 8. Başlangıç çoklu doğrusal regresyon modeli (Yönerge: Table 
 | Düzeltilmiş R² | 0,3733 | | | | |
 | Gözlem sayısı | 16.303 | | | | |
 
-**Genel anlamlılık.** F(10; 16.292) = 972,21 ve p < 0,001 olduğundan, en az bir bağımsız değişkenin fiyatı açıkladığı sonucuna varılmıştır. Başlangıç modeli istatistiksel olarak anlamlıdır.
+**Genel anlamlılık.** F(10; 16.292) = 972,21 ve p < 0,001 olduğundan en az bir bağımsız değişken fiyatı açıklamaktadır; başlangıç modeli istatistiksel olarak anlamlıdır.
 
 **Değişkenlerin anlamlılığı.**
 
 - Sayısal değişkenlerin ve iki kategorili değişkenlerin tamamı %5 düzeyinde anlamlıdır (Tablo 8).
 - `room_type` değişkeninin kuklalarına tek tek bakıldığında, Hotel room kuklası anlamlıyken Private room (p = 0,090) ve Shared room (p = 0,167) kuklaları anlamlı değildir.
-- Yönerge, üç ve daha fazla kategorili bir değişkenin anlamlılığının tek tek kukla katsayılarına göre değil, değişken bütün olarak ele alınarak değerlendirilmesini istemektedir. Bu nedenle `room_type`, `car` paketindeki `Anova()` fonksiyonuyla (Type II; Fox & Weisberg, 2019) kısmi F testine tabi tutulmuştur. Bu test, değişkenin üç kuklasını birlikte sınamaktadır.
-- Test sonucu F(3; 16.292) = 128,33 ve p < 0,001'dir. `room_type` bütün olarak anlamlıdır.
+- Yönerge, üç ve daha fazla kategorili bir değişkenin anlamlılığının değişken bütün olarak ele alınarak değerlendirilmesini istemektedir. Bu nedenle `room_type`, `car` paketindeki `Anova()` fonksiyonuyla (Type II; Fox & Weisberg, 2019) kısmi F testine tabi tutulmuştur. Test, değişkenin üç kuklasını birlikte sınar.
+- Test sonucu F(3; 16.292) = 128,33 ve p < 0,001'dir; `room_type` bütün olarak anlamlıdır.
 
-Buna göre başlangıç modelindeki sekiz değişkenin **tamamı anlamlıdır**; anlamsız değişken bulunmamaktadır. Başlangıç modeli revizyon sonucunda değişmediği için sayısal ve kategorik katsayıların yorumu (Step 1, madde 8), tekrara düşmemek amacıyla Bölüm 4.2.3'te son model üzerinden bir arada yapılmıştır.
+Buna göre başlangıç modelindeki sekiz değişkenin tamamı anlamlıdır. Başlangıç modeli revizyon sonucunda değişmediği için sayısal ve kategorik katsayıların yorumu (Step 1, madde 8), tekrara düşmemek amacıyla Bölüm 4.2.3'te son model üzerinden bir arada yapılmıştır.
 
-### 4.2.2. Step 2 – Model revizyonu
+### 4.2.2. Step 2: Model revizyonu
 
-Revizyon kuralı, p ≥ 0,05 olan değişkenlerin en yüksek p değerinden başlanarak birer birer çıkarılması ve modelin her seferinde yeniden tahmin edilmesidir. Bu kural uygulanmış, ancak başlangıç modelinde anlamsız değişken bulunmadığından **hiçbir değişken çıkarılmamıştır**.
+Revizyon kuralı, p ≥ 0,05 olan değişkenlerin en yüksek p değerinden başlanarak birer birer çıkarılması ve modelin her seferinde yeniden tahmin edilmesidir. Kural uygulanmış, ancak başlangıç modelinde anlamsız değişken olmadığı için hiçbir değişken çıkarılmamıştır. Bütün değişkenlerin anlamlı çıkmasının bir nedeni örneklemin büyük olmasıdır (16.303 gözlem): büyük örneklemde standart hatalar küçülür ve küçük etkiler bile istatistiksel olarak anlamlı hâle gelir.
 
-- Değişkenlerin tamamının anlamlı çıkmasının bir nedeni, örneklemin büyük olmasıdır (16.303 gözlem). Büyük örneklemde standart hatalar küçülür ve küçük etkiler bile istatistiksel olarak anlamlı hâle gelir.
-- Bu yüzden son model, başlangıç modeliyle aynıdır.
+### 4.2.3. Step 3: Son model
 
-### 4.2.3. Step 3 – Son model
-
-Step 2'de hiçbir değişken çıkarılmadığından son model başlangıç modeliyle aynıdır. Son model, yönergenin istediği biçimde ayrı bir tablo olarak Tablo 9'da sunulmuştur; katsayılar Tablo 8 ile aynıdır.
+Step 2'de hiçbir değişken çıkarılmadığından son model başlangıç modeliyle aynıdır. Yönerge istediği için son model ayrı bir tablo olarak Tablo 9'da verilmiştir; katsayılar Tablo 8 ile aynıdır.
 
 Table: Tablo 9. Son çoklu doğrusal regresyon modeli (Yönerge: Table 2 – Final Multiple Linear Regression Model)
 
@@ -469,26 +429,22 @@ Denklemde `reviews` = `number_of_reviews`, `availability` = `availability_365` a
 
 **Sayısal katsayıların yorumu.** Bütün yorumlar diğer değişkenler sabitken geçerlidir.
 
-- **`bedrooms` (B = 1.267,08):** Diğer değişkenler sabitken bir ek yatak odası, gecelik fiyatı ortalama 1.267 TL artırmaktadır.
-- **`bathrooms` (B = 1.379,35):** Diğer değişkenler sabitken bir ek banyo, fiyatı ortalama 1.379 TL artırmaktadır.
-- **`accommodates` (B = 373,97):** Diğer değişkenler sabitken bir kişilik ek kapasite, fiyatı ortalama 374 TL artırmaktadır.
-  - Bu etki, basit regresyondaki 1.049,31 TL'den belirgin biçimde küçüktür. Kapasite genellikle yatak odası ve banyo sayısıyla birlikte arttığından, basit modelde bu değişkenlerin etkisi de `accommodates` katsayısına yüklenmekteydi.
-  - Çoklu modelde etkiler birbirinden ayrıştırılmış ve katsayı, kapasitenin kendi etkisini gösterir hâle gelmiştir.
-- **`number_of_reviews` (B = −4,26):** Diğer değişkenler sabitken her ek yorum, fiyatın ortalama 4,26 TL düşük olmasıyla ilişkilidir.
-- **`availability_365` (B = 1,36):** Diğer değişkenler sabitken yıl içinde bir gün daha müsait olmak, fiyatı ortalama 1,36 TL artırmaktadır.
+- `bedrooms` (B = 1.267,08): Bir ek yatak odası gecelik fiyatı ortalama 1.267 TL artırır.
+- `bathrooms` (B = 1.379,35): Bir ek banyo fiyatı ortalama 1.379 TL artırır.
+- `accommodates` (B = 373,97): Bir kişilik ek kapasite fiyatı ortalama 374 TL artırır. Bu etki basit regresyondaki 1.049,31 TL'den belirgin biçimde küçüktür. Kapasite genellikle yatak odası ve banyo sayısıyla birlikte arttığı için basit modelde bu değişkenlerin etkisi de `accommodates` katsayısına yükleniyordu. Çoklu modelde etkiler ayrıştırılmış ve katsayı kapasitenin kendi etkisini gösterir hâle gelmiştir.
+- `number_of_reviews` (B = −4,26): Her ek yorum, fiyatın ortalama 4,26 TL daha düşük olmasıyla ilişkilidir.
+- `availability_365` (B = 1,36): Yıl içinde bir gün daha müsait olmak fiyatı ortalama 1,36 TL artırır.
 
 **Kategorik katsayıların yorumu.** Yorumlar referans kategoriye göre ve diğer değişkenler sabitken geçerlidir.
 
-- **`host_is_superhost` = Yes (B = 1.054,27):** Superhost olan ev sahiplerinin ilanları, diğer değişkenler sabitken, Superhost olmayanların ilanlarına göre ortalama 1.054 TL daha pahalıdır.
-- **`shared_bath` = Yes (B = −859,04):** Paylaşımlı banyolu ilanlar, diğer değişkenler sabitken, özel banyolu ilanlara göre ortalama 859 TL daha ucuzdur.
-- **`room_type` = Hotel room (B = 4.455,75):** Otel odaları, aynı kapasite, yatak odası ve banyo sayısına sahip bütün ev/dairelere göre ortalama 4.456 TL daha pahalıdır.
-- **`room_type` = Private room ve Shared room:** Bu kuklalar tek başlarına anlamlı değildir. Diğer değişkenler sabitken özel odaların ve paylaşımlı odaların fiyatı, bütün ev/dairelerden istatistiksel olarak farklı değildir.
-  - Ham ortalamalar arasında büyük bir fark vardır: bütün ev/dairelerde ortalama fiyat 6.155,73 TL iken özel odalarda 4.255,84 TL'dir.
-  - Bu farkın büyük kısmı, özel odaların daha az yatak odasına (ortalama 1,04, bütün ev/dairelerde 1,58), banyoya ve kapasiteye sahip olmasından kaynaklanmaktadır. Model bu farkları zaten ilgili sayısal değişkenlerle açıklamaktadır.
+- `host_is_superhost` = Yes (B = 1.054,27): Superhost ev sahiplerinin ilanları Superhost olmayanlarınkinden ortalama 1.054 TL daha pahalıdır.
+- `shared_bath` = Yes (B = −859,04): Paylaşımlı banyolu ilanlar özel banyolu ilanlardan ortalama 859 TL daha ucuzdur.
+- `room_type` = Hotel room (B = 4.455,75): Otel odaları, aynı kapasite, yatak odası ve banyo sayısına sahip bütün ev/dairelerden ortalama 4.456 TL daha pahalıdır.
+- `room_type` = Private room ve Shared room: Bu kuklalar tek başlarına anlamlı değildir; diğer değişkenler sabitken özel ve paylaşımlı odaların fiyatı bütün ev/dairelerden istatistiksel olarak farklı değildir. Oysa ham ortalamalar arasında büyük fark vardır: bütün ev/dairelerde ortalama fiyat 6.155,73 TL, özel odalarda 4.255,84 TL'dir. Bu farkın büyük kısmı, özel odaların daha az yatak odasına (ortalama 1,04; bütün ev/dairelerde 1,58), banyoya ve kapasiteye sahip olmasından gelir. Model bu farkı ilgili sayısal değişkenlerle zaten açıklamaktadır.
 
-**Özel kural (Special Rule).** Son modelde hem sayısal hem kategorik bağımsız değişkenler bulunmaktadır. Bu nedenle sayısal (ör. `bedrooms`) ve kategorik (ör. `host_is_superhost`) katsayılar doğrudan son modelden yorumlanmıştır; başlangıç modelinden ayrıca bir katsayı yorumlanmasına gerek kalmamıştır.
+**Özel kural (Special Rule).** Son modelde hem sayısal hem kategorik bağımsız değişkenler olduğu için sayısal (ör. `bedrooms`) ve kategorik (ör. `host_is_superhost`) katsayılar doğrudan son modelden yorumlanmıştır. Başlangıç modelinden ayrıca katsayı yorumlamaya gerek kalmamıştır.
 
-**İstatistiksel anlamlılık ve pratik önem.** Büyük örneklemde istatistiksel anlamlılık, etkinin pratikte önemli olduğu anlamına gelmez. Örneğin `availability_365` anlamlıdır (p < 0,001), ancak bir günlük ek müsaitliğin fiyata katkısı yalnızca 1,36 TL'dir. Yatak odası, banyo ve Superhost statüsü ise hem anlamlı hem de binlerce TL düzeyinde, pratikte önemli etkilere sahiptir.
+**İstatistiksel anlamlılık ve pratik önem.** Büyük örneklemde istatistiksel anlamlılık, etkinin pratikte önemli olduğu anlamına gelmez. Örneğin `availability_365` anlamlıdır (p < 0,001), ama bir günlük ek müsaitliğin fiyata katkısı yalnızca 1,36 TL'dir. Yatak odası, banyo ve Superhost statüsünün etkileri ise hem anlamlıdır hem de binlerce TL düzeyindedir.
 
 **R², düzeltilmiş R² ve başlangıç modeliyle karşılaştırma.** Model karşılaştırması Tablo 10'da verilmiştir.
 
@@ -501,45 +457,38 @@ Table: Tablo 10. Doğrusal regresyon modellerinin karşılaştırılması
 | Çoklu regresyon – son model | 8 | 972,21 | 0,3737 | 0,3733 |
 
 - Son model, fiyattaki değişkenliğin yaklaşık %37,4'ünü açıklamaktadır (R² = 0,3737).
-- Düzeltilmiş R² (0,3733) R²'ye çok yakındır. Bu yakınlık, modele eklenen değişkenlerin açıklama gücüne gerçek bir katkı sağladığını göstermektedir.
+- Düzeltilmiş R² (0,3733) R²'ye çok yakındır; modele eklenen değişkenler açıklama gücüne gerçek bir katkı sağlamaktadır.
 - Hiçbir değişken çıkarılmadığından son modelin açıklama gücü başlangıç modeliyle aynıdır.
-- Basit regresyona göre R², 0,2829'dan 0,3737'ye yükselmiş, artıkların standart hatası ise 3.668 TL'den 3.429 TL'ye düşmüştür. Ek değişkenler fiyatı açıklamaya anlamlı bir katkı sağlamıştır.
+- Basit regresyona göre R² 0,2829'dan 0,3737'ye yükselmiş, artıkların standart hatası 3.668 TL'den 3.429 TL'ye düşmüştür.
 
 # 5. İkili Lojistik Regresyon Sonuçları
 
-Bu bölümde, Bölüm 2.5'te oluşturulan `high_price` değişkeni (1 = yüksek fiyat) dört lojistik regresyon modelinin bağımlı değişkeni olarak kullanılmıştır. Modeller `glm(..., family = binomial)` ile tahmin edilmiştir. Genel model şöyledir:
+Dört lojistik regresyon modelinin bağımlı değişkeni Bölüm 2.5'te oluşturulan `high_price` değişkenidir (1 = yüksek fiyat). Modeller `glm(..., family = binomial)` ile tahmin edilmiştir. Genel model şöyledir:
 
 $$\text{logit}(p) = \ln\left[\frac{p}{1-p}\right] = \beta_0 + \beta_1 X_1 + \dots + \beta_k X_k$$
 
-**Temel kavramlar.** Yorumlarda kullanılan kavramlar şunlardır:
+**Temel kavramlar.** Yorumlarda şu kavramlar kullanılmıştır:
 
-- **p:** İlanın yüksek fiyatlı olma olasılığı.
-- **Odds:** p/(1 − p), yani olayın gerçekleşme olasılığının gerçekleşmeme olasılığına oranı.
-- **B katsayısı:** X'teki bir birimlik artışın log-odds üzerindeki etkisi.
-- **Exp(B) (odds oranı):** X bir birim arttığında odds'un kaç katına çıktığı. Exp(B) > 1 odds'un arttığını, Exp(B) < 1 azaldığını gösterir.
+- p: İlanın yüksek fiyatlı olma olasılığı.
+- Odds: p/(1 − p), yani olayın gerçekleşme olasılığının gerçekleşmeme olasılığına oranı.
+- B katsayısı: X'teki bir birimlik artışın log-odds üzerindeki etkisi.
+- Exp(B) (odds oranı): X bir birim arttığında odds'un kaç katına çıktığı. Exp(B) > 1 odds'un arttığını, Exp(B) < 1 azaldığını gösterir.
 
-Exp(B), olasılığın değil **odds'un** çarpımsal değişimini ifade eder. Odds'un iki katına çıkması, olasılığın iki katına çıkması anlamına gelmez. Örneğin bir ilan için olasılık 0,27'den 0,59'a yükselirken odds 0,37'den 1,44'e çıkmaktadır (Tablo 12).
+Exp(B), olasılığın değil odds'un çarpımsal değişimini ifade eder. Odds'un iki katına çıkması olasılığın da iki katına çıktığı anlamına gelmez. Örneğin bir ilan için olasılık 0,27'den 0,59'a yükselirken odds 0,37'den 1,44'e çıkmaktadır (Tablo 12).
 
 Katsayıların anlamlılığı Wald z testiyle değerlendirilmiştir. Bütün modellerde sınıflandırma eşiği 0,50'dir.
 
-**Uyum iyiliği ölçütleri.** Her model için Hosmer–Lemeshow (HL) testi `ResourceSelection` paketindeki `hoslem.test()` fonksiyonuyla (Lele et al., 2023); McFadden, Cox & Snell ve Nagelkerke pseudo R² değerleri ise `DescTools` paketindeki `PseudoR2()` fonksiyonuyla (Signorell, 2025) hesaplanmıştır.
+**Uyum iyiliği ölçütleri.** Her model için Hosmer–Lemeshow (HL) testi `ResourceSelection` paketindeki `hoslem.test()` fonksiyonuyla (Lele et al., 2023), McFadden, Cox & Snell ve Nagelkerke pseudo R² değerleri `DescTools` paketindeki `PseudoR2()` fonksiyonuyla (Signorell, 2025) hesaplanmıştır.
 
-- **Hosmer–Lemeshow testi:** İlanları tahmini olasılığa göre on gruba ayırır ve her gruptaki gözlenen ile beklenen yüksek fiyatlı ilan sayılarını karşılaştırır.
-  - H₀ "model veriye uymaktadır" şeklindedir.
-  - Bu nedenle **p > 0,05 iyi uyum**, p < 0,05 ise kötü uyum anlamına gelir.
-- **Pseudo R² değerleri neden doğrusal R² gibi yorumlanmaz:**
-  - Lojistik regresyonda bağımlı değişken yalnızca 0 ve 1 değerlerini alır ve model en küçük kareler yerine en çok olabilirlik (maximum likelihood) yöntemiyle tahmin edilir. Bu nedenle doğrusal regresyondaki anlamıyla bir "açıklanan varyans oranı" yoktur.
-  - Pseudo R² değerleri, modelin olabilirliğinin yalnızca sabit terim içeren modele göre ne kadar iyileştiğini ölçer. "Varyansın %X'i açıklandı" biçiminde yorumlanamazlar.
-  - **McFadden R²** doğası gereği düşük değerler alır; 0,2–0,4 aralığı iyi bir uyum olarak kabul edilir.
-  - **Cox & Snell R²** ikili bağımlı değişkende 1'e ulaşamaz. Bu veride ulaşabileceği en yüksek değer 0,7500'dür.
-  - **Nagelkerke R²**, Cox & Snell değerini bu en yüksek değere bölerek 0–1 aralığına ölçekler.
-  - Bu ölçütler en anlamlı biçimde aynı veri üzerindeki modelleri birbiriyle karşılaştırmak için kullanılır.
+Hosmer–Lemeshow testi ilanları tahmini olasılığa göre on gruba ayırır ve her gruptaki gözlenen ve beklenen yüksek fiyatlı ilan sayılarını karşılaştırır. H₀ "model veriye uymaktadır" olduğu için p > 0,05 iyi uyum, p < 0,05 kötü uyum anlamına gelir.
 
-**Sınıflandırma başarısı.** Bağımlı değişkenin dağılımı neredeyse eşittir: 8.162 ilan 0 (%50,06), 8.141 ilan 1 (%49,94) değerini almaktadır. Hiçbir değişken kullanmadan bütün ilanları çoğunluk sınıfı olan "0" olarak tahmin eden bir yaklaşım bile %50,06 doğruluk elde ederdi. Bu nedenle accuracy değerleri bu **taban orana (%50,06)** göre yorumlanmıştır.
+Pseudo R² değerleri doğrusal R² gibi yorumlanmaz. Lojistik regresyonda bağımlı değişken yalnızca 0 ve 1 değerlerini alır ve model en küçük kareler yerine en çok olabilirlik (maximum likelihood) yöntemiyle tahmin edilir. Bu yüzden doğrusal regresyondaki anlamıyla bir "açıklanan varyans oranı" yoktur. Pseudo R², modelin olabilirliğinin yalnızca sabit terim içeren modele göre ne kadar iyileştiğini ölçer ve "varyansın %X'i açıklandı" diye okunamaz. McFadden R² doğası gereği düşük değerler alır; 0,2–0,4 aralığı iyi uyum sayılır. Cox & Snell R² ikili bağımlı değişkende 1'e ulaşamaz ve bu veride alabileceği en yüksek değer 0,7500'dür. Nagelkerke R² ise Cox & Snell değerini bu en yüksek değere bölerek 0–1 aralığına ölçekler. Bu ölçütler en çok aynı veri üzerindeki modelleri karşılaştırmak için işe yarar.
 
-## 5.1. Model 1 – Sayısal bağımsız değişken (accommodates)
+**Sınıflandırma başarısı.** Bağımlı değişkenin dağılımı neredeyse eşittir: 8.162 ilan 0 (%50,06), 8.141 ilan 1 (%49,94) değerini almaktadır. Hiçbir değişken kullanmadan bütün ilanları çoğunluk sınıfı olan "0" olarak tahmin etmek bile %50,06 doğruluk verirdi. Accuracy değerleri bu yüzden %50,06'lık taban orana göre yorumlanmıştır.
 
-Model 1'de yüksek fiyatlı olma durumu yalnızca kişi kapasitesiyle açıklanmıştır. Modelin katsayıları Tablo 11'de verilmiştir.
+## 5.1. Model 1: Sayısal bağımsız değişken (accommodates)
+
+Model 1, yüksek fiyatlı olmayı yalnızca kişi kapasitesiyle açıklar. Katsayılar Tablo 11'dedir.
 
 Table: Tablo 11. Model 1 katsayıları (high_price ~ accommodates)
 
@@ -548,11 +497,7 @@ Table: Tablo 11. Model 1 katsayıları (high_price ~ accommodates)
 | (Sabit) | −2,3503 | 0,0470 | −50,017 | < 0,001 | 0,0953 |
 | accommodates | 0,6782 | 0,0134 | 50,638 | < 0,001 | 1,9704 |
 
-**Anlamlılık ve katsayılar.** `accommodates` anlamlıdır (z = 50,64, p < 0,001).
-
-- **B = 0,6782:** Katsayının pozitif olması, kapasite arttıkça yüksek fiyatlı olma olasılığının da arttığını gösterir. Teknik olarak bir kişilik kapasite artışı log-odds'u 0,6782 artırmaktadır.
-- **Exp(B) = 1,9704:** **Kapasite bir kişi arttığında, ilanın yüksek fiyatlı olma odds'u 1,97 katına çıkmaktadır (%97,0 artış).**
-- **Sabit terim:** Exp(B₀) = 0,0953 kapasitenin 0 olduğu durumdaki odds'tur ve pratik bir anlamı yoktur.
+**Anlamlılık ve katsayılar.** `accommodates` anlamlıdır (z = 50,64, p < 0,001). B = 0,6782 pozitif olduğu için kapasite arttıkça yüksek fiyatlı olma olasılığı da artar; teknik olarak bir kişilik kapasite artışı log-odds'u 0,6782 artırır. Exp(B) = 1,9704'tür: kapasite bir kişi arttığında ilanın yüksek fiyatlı olma odds'u 1,97 katına çıkar (%97,0 artış). Sabit terimden gelen Exp(B₀) = 0,0953, kapasitenin 0 olduğu durumdaki odds'tur ve pratik bir anlamı yoktur.
 
 **Tahmini lojistik regresyon denklemi:**
 
@@ -568,15 +513,11 @@ Table: Tablo 12. Model 1'e göre tahmini olasılıklar
 | 4 | 0,3626 | 1,4370 | 0,5897 |
 | 6 | 1,7190 | 5,5790 | 0,8480 |
 
-**Tahmini olasılıklar.** 2 kişilik bir ilanın yüksek fiyatlı olma olasılığı 0,2701, 4 kişilik bir ilanın 0,5897, 6 kişilik bir ilanın ise 0,8480'dir. Veri setindeki bütün ilanlar için tahmini olasılıklar 0,1581 ile 0,9998 arasında değişmektedir.
+**Tahmini olasılıklar.** 2 kişilik bir ilanın yüksek fiyatlı olma olasılığı 0,2701, 4 kişilik bir ilanın 0,5897, 6 kişilik bir ilanın 0,8480'dir. Veri setindeki bütün ilanlar için tahmini olasılıklar 0,1581 ile 0,9998 arasındadır.
 
-Tablo 12 odds ile olasılık arasındaki farkı da açıkça göstermektedir. Odds her iki kişilik artışta aynı oranda çarpılarak büyürken, olasılıktaki artış sabit değildir: 2'den 4 kişiye geçişte olasılık 0,2701'den 0,5897'ye, 4'ten 6 kişiye geçişte ise 0,5897'den 0,8480'e yükselmektedir.
+Tablo 12 odds ile olasılık arasındaki farkı da gösterir. Odds her iki kişilik artışta aynı oranla çarpılarak büyür, olasılıktaki artış ise sabit değildir: 2'den 4 kişiye geçişte olasılık 0,2701'den 0,5897'ye, 4'ten 6 kişiye geçişte ise 0,5897'den 0,8480'e yükselmektedir.
 
-**Uyum iyiliği.**
-
-- **Hosmer–Lemeshow testi:** χ² = 37,14, df = 4, p < 0,001; H₀ reddedilmiştir ve uyum yetersizdir.
-  - Test için on grup istenmiş, ancak yalnızca altı grup oluşabilmiştir. `accommodates` değişkeni yalnızca 16 farklı değer almakta ve ilanların %35,23'ü (5.743 ilan) 2 kişiliktir. Aynı tahmini olasılığa sahip çok sayıda ilan bulunduğundan grup sınırları çakışmış ve serbestlik derecesi 6 − 2 = 4 olmuştur.
-- **Pseudo R²:** McFadden 0,1803, Cox & Snell 0,2211, Nagelkerke 0,2948. Tek değişkenli bir model için McFadden değeri iyi uyum sınırına (0,2) yakındır.
+**Uyum iyiliği.** Hosmer–Lemeshow testinde χ² = 37,14, df = 4 ve p < 0,001'dir; H₀ reddedilir ve uyum yetersizdir. Test için on grup istenmiş, ancak yalnızca altı grup oluşabilmiştir. `accommodates` yalnızca 16 farklı değer alır ve ilanların %35,23'ü (5.743 ilan) 2 kişiliktir. Aynı tahmini olasılığa sahip çok sayıda ilan olduğu için grup sınırları çakışmış ve serbestlik derecesi 6 − 2 = 4 olmuştur. Pseudo R² değerleri McFadden 0,1803, Cox & Snell 0,2211 ve Nagelkerke 0,2948'dir. Tek değişkenli bir model için McFadden değeri iyi uyum sınırına (0,2) yakındır.
 
 Table: Tablo 13. Model 1 karışıklık matrisi (eşik = 0,50)
 
@@ -585,18 +526,15 @@ Table: Tablo 13. Model 1 karışıklık matrisi (eşik = 0,50)
 | **Gerçek: 0** | TN = 6.361 | FP = 1.801 |
 | **Gerçek: 1** | FN = 2.866 | TP = 5.275 |
 
-**Sınıflandırma başarısı.** Tablo 13'teki karışıklık matrisine göre accuracy = (5.275 + 6.361) / 16.303 = **0,7137 (%71,37)**. Model, %50,06'lık taban orana göre 21,31 puanlık bir iyileşme sağlamaktadır. Yanlış negatiflerin (2.866) yanlış pozitiflerden (1.801) fazla olması, modelin küçük kapasiteli ama yüksek fiyatlı ilanları kaçırmaya daha yatkın olduğunu göstermektedir.
+**Sınıflandırma başarısı.** Tablo 13'teki karışıklık matrisine göre accuracy = (5.275 + 6.361) / 16.303 = 0,7137 (%71,37). Bu, %50,06'lık taban orana göre 21,31 puanlık bir iyileşmedir. Yanlış negatifler (2.866) yanlış pozitiflerden (1.801) fazladır; model küçük kapasiteli ama yüksek fiyatlı ilanları kaçırmaya daha yatkındır.
 
 ![Şekil 1. Model 1: Kişi kapasitesine göre yüksek fiyatlı olma olasılığı (lojistik eğri). Kesikli çizgi 0,50 eşiğidir.](../output/figures/06_model1_probability_curve.png){width=95%}
 
-**Grafiğin yorumu.** Şekil 1, kapasite arttıkça yüksek fiyatlı olma olasılığının S biçiminde arttığını göstermektedir.
+**Grafiğin yorumu.** Şekil 1'de kapasite arttıkça yüksek fiyatlı olma olasılığı S biçiminde artar. Olasılık 1 kişilik ilanlarda yaklaşık 0,16'dır ve 3 ile 4 kişi arasında 0,50 eşiğini geçer. Bu yüzden 0,50 eşiğinde 4 ve üzeri kişilik ilanlar "yüksek fiyatlı" olarak sınıflandırılır. Eğri orta kapasitelerde dik, uçlarda yatıktır. En büyük olasılık artışı 2–6 kişi aralığındadır; 8 kişinin üzerinde olasılık 1'e yaklaştığı için ek kapasite olasılığı çok az değiştirir.
 
-- Olasılık 1 kişilik ilanlarda yaklaşık 0,16'dır ve 3 ile 4 kişi arasında 0,50 eşiğini geçmektedir. Bu nedenle 0,50 eşiğinde 4 ve üzeri kişilik ilanlar "yüksek fiyatlı" olarak sınıflandırılmaktadır.
-- Eğri orta kapasitelerde dik, uçlarda yatıktır. En büyük olasılık artışı 2–6 kişi aralığındadır; 8 kişinin üzerinde olasılık 1'e yaklaştığı için ek kapasite olasılığı çok az değiştirmektedir.
+## 5.2. Model 2: İki kategorili bağımsız değişken (host_is_superhost)
 
-## 5.2. Model 2 – İki kategorili bağımsız değişken (host_is_superhost)
-
-Referans kategori **No** (Superhost olmayan ev sahibi) olarak belirlenmiştir. Modelin katsayıları Tablo 14'te verilmiştir.
+Referans kategori No'dur (Superhost olmayan ev sahibi). Katsayılar Tablo 14'tedir.
 
 Table: Tablo 14. Model 2 katsayıları (high_price ~ host_is_superhost)
 
@@ -605,26 +543,11 @@ Table: Tablo 14. Model 2 katsayıları (high_price ~ host_is_superhost)
 | (Sabit) | −0,3089 | 0,0195 | −15,881 | < 0,001 | 0,7343 |
 | host_​is_​superhost: Yes | 0,9260 | 0,0344 | 26,950 | < 0,001 | 2,5244 |
 
-**Anlamlılık ve katsayılar.** Superhost statüsü anlamlıdır (z = 26,95, p < 0,001).
+**Anlamlılık ve katsayılar.** Superhost statüsü anlamlıdır (z = 26,95, p < 0,001). B = 0,9260 pozitif olduğu için Superhost ilanlarının yüksek fiyatlı olma olasılığı daha yüksektir. Exp(B) = 2,5244'tür: Superhost ev sahiplerinin ilanlarının yüksek fiyatlı olma odds'u, Superhost olmayanların ilanlarının odds'unun 2,52 katıdır. Sabit terimden gelen Exp(B₀) = 0,7343 ise referans grubun (Superhost olmayan) odds'udur.
 
-- **B = 0,9260:** Katsayının pozitif olması, Superhost ilanlarının yüksek fiyatlı olma olasılığının daha yüksek olduğunu göstermektedir.
-- **Exp(B) = 2,5244:** **Superhost olan ev sahiplerinin ilanlarının yüksek fiyatlı olma odds'u, Superhost olmayanların ilanlarının odds'unun 2,52 katıdır.**
-- **Sabit terim:** Exp(B₀) = 0,7343 referans grubun (Superhost olmayan) odds'udur.
+Superhost olmayan ilanlarda tahmini olasılık 0,4234 ve odds 0,7343, Superhost ilanlarında olasılık 0,6496 ve odds 1,8536'dır. Odds'ların oranı Exp(B) değerini verir, olasılıkların oranı ise 2,52 değildir. Bu yüzden sonuç "olasılık 2,52 kat artar" diye yorumlanamaz.
 
-Gruplara göre tahmini değerler şöyledir:
-
-- **Superhost olmayan ilanlar:** Olasılık 0,4234, odds 0,7343.
-- **Superhost ilanları:** Olasılık 0,6496, odds 1,8536.
-
-Odds'lar oranlandığında Exp(B) değeri elde edilir; olasılıkların oranı ise 2,52 değildir. Bu nedenle sonuç "olasılık 2,52 kat artar" biçiminde yorumlanamaz.
-
-**Uyum iyiliği.**
-
-- **Hosmer–Lemeshow testi bu modelde uygulanamamıştır.** Gerekçesi şudur:
-  - Modelde yalnızca bir iki kategorili değişken bulunduğundan, aynı kategorideki bütün ilanlara aynı olasılık atanmaktadır. Modelde yalnızca iki farklı tahmini olasılık vardır ve bu nedenle test için gereken on grup oluşturulamaz.
-  - Daha temel bir neden olarak, bu model "doymuş" (saturated) bir modeldir: her kategori için tahmin edilen olasılık, o kategorideki gerçek yüksek fiyat oranına tam olarak eşittir. Gözlenen ve beklenen değerler tanım gereği eşit olduğundan, test hesaplansa bile uyum hakkında bilgi vermez.
-  - Bu nedenle modelin uyumu pseudo R² değerleriyle değerlendirilmiştir.
-- **Pseudo R²:** McFadden 0,0333, Cox & Snell 0,0451, Nagelkerke 0,0602. Değerler çok düşüktür. Superhost statüsü anlamlı bir değişken olmakla birlikte, tek başına yüksek fiyatı açıklamakta zayıf kalmaktadır.
+**Uyum iyiliği.** Hosmer–Lemeshow testi bu modelde uygulanamamıştır. Modelde tek bir iki kategorili değişken olduğu için aynı kategorideki bütün ilanlara aynı olasılık atanır. Yalnızca iki farklı tahmini olasılık olduğundan test için gereken on grup oluşturulamaz. Daha temel bir neden de modelin "doymuş" (saturated) olmasıdır: her kategori için tahmin edilen olasılık, o kategorideki gerçek yüksek fiyat oranına tam olarak eşittir. Gözlenen ve beklenen değerler tanım gereği eşit olduğundan test hesaplansa bile uyum hakkında bilgi vermez. Modelin uyumu bu nedenle pseudo R² değerleriyle değerlendirilmiştir: McFadden 0,0333, Cox & Snell 0,0451, Nagelkerke 0,0602. Değerler çok düşüktür; Superhost statüsü anlamlı olsa da yüksek fiyatı tek başına açıklamakta zayıf kalır.
 
 Table: Tablo 15. Model 2 karışıklık matrisi (eşik = 0,50)
 
@@ -633,18 +556,15 @@ Table: Tablo 15. Model 2 karışıklık matrisi (eşik = 0,50)
 | **Gerçek: 0** | TN = 6.243 | FP = 1.919 |
 | **Gerçek: 1** | FN = 4.584 | TP = 3.557 |
 
-**Sınıflandırma başarısı.** Tablo 15'teki karışıklık matrisine göre accuracy = (3.557 + 6.243) / 16.303 = **0,6011 (%60,11)**; taban orana göre iyileşme 10,05 puandır.
-
-- Model, Superhost olan bütün ilanları "yüksek" (p = 0,6496), olmayanları "düşük" (p = 0,4234) olarak sınıflandırmaktadır.
-- Yüksek fiyatlı ilanların önemli bir kısmının ev sahibi Superhost olmadığından yanlış negatif sayısı yüksektir (4.584).
+**Sınıflandırma başarısı.** Tablo 15'teki karışıklık matrisine göre accuracy = (3.557 + 6.243) / 16.303 = 0,6011 (%60,11) ve taban orana göre iyileşme 10,05 puandır. Model Superhost olan bütün ilanları "yüksek" (p = 0,6496), olmayanları "düşük" (p = 0,4234) olarak sınıflandırır. Yüksek fiyatlı ilanların önemli bir kısmının ev sahibi Superhost olmadığı için yanlış negatif sayısı yüksektir (4.584).
 
 ![Şekil 2. Model 2: Superhost statüsüne göre yüksek fiyatlı olma olasılığı. Referans kategori: No.](../output/figures/06_model2_probability.png){width=85%}
 
-**Grafiğin yorumu.** Modelde sayısal bir bağımsız değişken bulunmadığından sürekli bir lojistik eğri çizilememiştir. Yönerge 4.3, kategorik değişkenlerin referans kategoriden diğer kategorilere geçtiğinde olasılığın nasıl değiştiğinin yorumlanmasını öngörmektedir. Bu nedenle Şekil 2'de her kategori için tahmini olasılık gösterilmiştir. Referans kategoriden (No: 0,4234) Superhost kategorisine (Yes: 0,6496) geçildiğinde, yüksek fiyatlı olma olasılığı 0,50 eşiğinin altından üstüne çıkmaktadır.
+**Grafiğin yorumu.** Modelde sayısal bağımsız değişken olmadığı için sürekli bir lojistik eğri çizilemez. Yönerge 4.3, kategorik değişkenlerde referans kategoriden diğer kategorilere geçince olasılığın nasıl değiştiğinin yorumlanmasını öngörür; bu yüzden Şekil 2'de her kategori için tahmini olasılık gösterilmiştir. Referans kategoriden (No: 0,4234) Superhost kategorisine (Yes: 0,6496) geçince yüksek fiyatlı olma olasılığı 0,50 eşiğinin altından üstüne çıkar.
 
-## 5.3. Model 3 – Çok kategorili bağımsız değişken (room_type)
+## 5.3. Model 3: Çok kategorili bağımsız değişken (room_type)
 
-`room_type` değişkeni dört düzeyli bir factor'e çevrilmiştir. Referans kategori **Entire home/apt** olarak belirlenmiştir. Modelin katsayıları Tablo 16'da verilmiştir.
+`room_type` dört düzeyli bir factor'e çevrilmiş ve referans kategori Entire home/apt seçilmiştir. Katsayılar Tablo 16'dadır.
 
 Table: Tablo 16. Model 3 katsayıları (high_price ~ room_type)
 
@@ -655,22 +575,16 @@ Table: Tablo 16. Model 3 katsayıları (high_price ~ room_type)
 | room_​type: Hotel room | 0,2018 | 0,1382 | 1,460 | 0,144 | 1,2236 |
 | room_​type: Shared room | −1,8717 | 0,2354 | −7,951 | < 0,001 | 0,1539 |
 
-**Anlamlılık.** `room_type`, olabilirlik oranı ki-kare testiyle (`car::Anova`; Fox & Weisberg, 2019) bütün olarak sınanmıştır. Test sonucu χ²(3) = 1.222,9 ve p < 0,001'dir; `room_type` bütün olarak anlamlıdır.
+**Anlamlılık.** `room_type`, olabilirlik oranı ki-kare testiyle (`car::Anova`; Fox & Weisberg, 2019) bütün olarak sınanmıştır. χ²(3) = 1.222,9 ve p < 0,001 olduğundan `room_type` bütün olarak anlamlıdır.
 
-**Kategorilerin odds'unun referans kategoriye göre farkı:**
+**Kategorilerin referans kategoriye göre odds farkları.**
 
-- **Private room (Exp(B) = 0,2794, p < 0,001):** Özel odaların yüksek fiyatlı olma odds'u, bütün ev/dairelerin odds'unun 0,28 katıdır, yani %72,1 daha düşüktür.
-- **Hotel room (Exp(B) = 1,2236, p = 0,144):** Otel odalarının odds'u bütün ev/dairelere göre %22,4 daha yüksektir. Ancak bu fark istatistiksel olarak anlamlı değildir; bu modelde otel odaları ile bütün ev/daireler arasında anlamlı bir fark bulunmamaktadır. Kategoride yalnızca 228 ilan bulunması standart hatayı büyütmektedir.
-- **Shared room (Exp(B) = 0,1539, p < 0,001):** Paylaşımlı odaların odds'u, bütün ev/dairelerin odds'unun 0,15 katıdır, yani %84,6 daha düşüktür.
-- **Sabit terim:** Exp(B₀) = 1,3749 referans kategorinin (Entire home/apt) odds'udur.
+- Private room (Exp(B) = 0,2794, p < 0,001): Özel odaların yüksek fiyatlı olma odds'u bütün ev/dairelerin 0,28 katıdır, yani %72,1 daha düşüktür.
+- Hotel room (Exp(B) = 1,2236, p = 0,144): Otel odalarının odds'u bütün ev/dairelerden %22,4 yüksektir, ancak bu fark istatistiksel olarak anlamlı değildir. Kategoride yalnızca 228 ilan olması standart hatayı büyütür.
+- Shared room (Exp(B) = 0,1539, p < 0,001): Paylaşımlı odaların odds'u bütün ev/dairelerin 0,15 katıdır, yani %84,6 daha düşüktür.
+- Sabit terim: Exp(B₀) = 1,3749, referans kategorinin (Entire home/apt) odds'udur.
 
-**Uyum iyiliği.**
-
-- **Hosmer–Lemeshow testi bu modelde de uygulanamamıştır.** Model 2'de açıklanan gerekçe burada da geçerlidir:
-  - Modelde yalnızca dört farklı tahmini olasılık bulunmaktadır ve on grup oluşturulamaz.
-  - Model doymuştur; her kategorinin tahmini olasılığı, o kategorideki gerçek oranla aynıdır.
-  - Test zorla hesaplansa bile gözlenen ve beklenen değerler eşit olduğundan "mükemmel uyum" gibi görünen ancak bilgi taşımayan bir sonuç verecektir. Bu nedenle test sonucu üretilmemiştir.
-- **Pseudo R²:** McFadden 0,0541, Cox & Snell 0,0723, Nagelkerke 0,0964. Oda tipi anlamlı olmakla birlikte tek başına açıklama gücü düşüktür.
+**Uyum iyiliği.** Hosmer–Lemeshow testi Model 2'deki nedenlerle bu modelde de uygulanamamıştır. Modelde yalnızca dört farklı tahmini olasılık vardır, bu yüzden on grup oluşturulamaz. Model doymuştur; her kategorinin tahmini olasılığı o kategorideki gerçek oranla aynıdır. Test zorla hesaplansaydı gözlenen ve beklenen değerler eşit çıkacağı için "mükemmel uyum" gibi görünen ama bilgi taşımayan bir sonuç verirdi. Bu nedenle test sonucu üretilmemiştir. Pseudo R² değerleri McFadden 0,0541, Cox & Snell 0,0723 ve Nagelkerke 0,0964'tür; oda tipi anlamlı olsa da tek başına açıklama gücü düşüktür.
 
 Table: Tablo 17. Model 3 karışıklık matrisi (eşik = 0,50)
 
@@ -679,28 +593,20 @@ Table: Tablo 17. Model 3 karışıklık matrisi (eşik = 0,50)
 | **Gerçek: 0** | TN = 3.118 | FP = 5.044 |
 | **Gerçek: 1** | FN = 1.180 | TP = 6.961 |
 
-**Sınıflandırma başarısı.** Tablo 17'deki karışıklık matrisine göre accuracy = (6.961 + 3.118) / 16.303 = **0,6182 (%61,82)**; taban orana göre iyileşme 11,76 puandır.
-
-- Model, tahmini olasılığı 0,50'nin üzerinde olan Entire home/apt ve Hotel room ilanlarının tamamını "yüksek", Private room ve Shared room ilanlarının tamamını "düşük" olarak sınıflandırmaktadır.
-- Ucuz bütün ev/daireler de "yüksek" olarak sınıflandırıldığından yanlış pozitif sayısı yüksektir (5.044).
+**Sınıflandırma başarısı.** Tablo 17'deki karışıklık matrisine göre accuracy = (6.961 + 3.118) / 16.303 = 0,6182 (%61,82) ve taban orana göre iyileşme 11,76 puandır. Model, tahmini olasılığı 0,50'nin üzerinde olan Entire home/apt ve Hotel room ilanlarının tamamını "yüksek", Private room ve Shared room ilanlarının tamamını "düşük" olarak sınıflandırır. Ucuz bütün ev/daireler de "yüksek" sınıfına girdiği için yanlış pozitif sayısı yüksektir (5.044).
 
 ![Şekil 3. Model 3: Oda tipine göre yüksek fiyatlı olma olasılığı. Referans kategori: Entire home/apt.](../output/figures/06_model3_probability.png){width=95%}
 
-**Grafiğin yorumu.** Model 2'de olduğu gibi, sayısal bağımsız değişken bulunmadığından Şekil 3'te kategori bazında tahmini olasılıklar gösterilmiştir. Bu gösterim, yönerge 4.3'ün kategoriler arası değişime ilişkin yorum ifadesine uygundur. Referans kategoriye (Entire home/apt: 0,5789) göre:
+**Grafiğin yorumu.** Model 2'de olduğu gibi sayısal bağımsız değişken olmadığından Şekil 3'te kategori bazında tahmini olasılıklar gösterilmiştir; bu gösterim yönerge 4.3'ün kategoriler arası değişime ilişkin yorum ifadesine uygundur. Referans kategoride (Entire home/apt) olasılık 0,5789'dur. Hotel room'da olasılık hafifçe yükselir (0,6272), Private room'da (0,2776) ve Shared room'da (0,1746) ise belirgin biçimde düşer.
 
-- Hotel room'da olasılık hafifçe yükselmektedir (0,6272).
-- Private room'da (0,2776) ve Shared room'da (0,1746) olasılık belirgin biçimde düşmektedir.
+## 5.4. Model 4: Karma bağımsız değişkenli çoklu lojistik regresyon
 
-Oda kiralamak, bütün ev/daire kiralamaya göre yüksek fiyatlı olma olasılığını açıkça azaltmaktadır.
+Bu modelde çoklu doğrusal regresyondaki bütün değişkenler kullanılmıştır:
 
-## 5.4. Model 4 – Karma bağımsız değişkenli çoklu lojistik regresyon
+- Sayısal: `accommodates`, `bedrooms`, `bathrooms`, `number_of_reviews`, `availability_365`.
+- Kategorik: `host_is_superhost` (referans: No), `shared_bath` (referans: No), `room_type` (referans: Entire home/apt).
 
-Bu modelde, çoklu doğrusal regresyondaki değişkenlerin tamamı kullanılmıştır:
-
-- **Sayısal:** `accommodates`, `bedrooms`, `bathrooms`, `number_of_reviews`, `availability_365`.
-- **Kategorik:** `host_is_superhost` (referans: No), `shared_bath` (referans: No), `room_type` (referans: Entire home/apt).
-
-Modelin katsayıları, Exp(B) değerleri ve odds'taki yüzde değişimler Tablo 18'de verilmiştir.
+Katsayılar, Exp(B) değerleri ve odds'taki yüzde değişimler Tablo 18'dedir.
 
 Table: Tablo 18. Model 4 katsayıları (karma model)
 
@@ -718,36 +624,25 @@ Table: Tablo 18. Model 4 katsayıları (karma model)
 | room_​type: Hotel room | 1,4046 | 0,1459 | 9,624 | < 0,001 | 4,0738 | +%307,38 |
 | room_​type: Shared room | −0,3366 | 0,2853 | −1,180 | 0,238 | 0,7142 | −%28,58 |
 
-**Anlamlılık.** Bütün değişkenler %5 düzeyinde anlamlıdır.
-
-- Tek dereceli değişkenlerin anlamlılığı Wald z testiyle değerlendirilmiştir.
-- `room_type` bütün olarak olabilirlik oranı testiyle sınanmış ve anlamlı bulunmuştur (χ²(3) = 187,03, p < 0,001).
-- Shared room kuklası tek başına anlamlı değildir (p = 0,238). Ancak değişken bütün olarak değerlendirildiğinden modelde tutulmuştur.
+**Anlamlılık.** Bütün değişkenler %5 düzeyinde anlamlıdır. Tek dereceli değişkenler Wald z testiyle, `room_type` ise bütün olarak olabilirlik oranı testiyle sınanmıştır (χ²(3) = 187,03, p < 0,001). Shared room kuklası tek başına anlamlı değildir (p = 0,238), ancak değişken bütün olarak değerlendirildiği için modelde tutulmuştur.
 
 **Sayısal katsayıların yorumu.** Bütün yorumlar diğer değişkenler sabitken ve bir birimlik artış için geçerlidir.
 
-- **`bedrooms` (Exp(B) = 2,0461):** Bir ek yatak odası, yüksek fiyatlı olma odds'unu 2,05 katına çıkarmaktadır. Bu, modeldeki en güçlü sayısal etkidir.
-- **`bathrooms` (Exp(B) = 1,8607):** Bir ek banyo odds'u 1,86 katına çıkarmaktadır.
-- **`accommodates` (Exp(B) = 1,4609):** Bir kişilik ek kapasite odds'u %46,09 artırmaktadır. Model 1'deki 1,9704 değerine göre daha küçük olan bu etki, yatak odası ve banyo sayısı sabit tutulduğunda kapasitenin kendi etkisini yansıtmaktadır.
-- **`number_of_reviews` (Exp(B) = 0,9966):** Bir yorumluk birim çok küçük olduğundan 100 yorum üzerinden yorumlamak daha anlaşılırdır: 100 ek yorum, yüksek fiyatlı olma odds'unu 0,7104 katına indirmektedir (%28,96 azalış).
-- **`availability_365` (Exp(B) = 1,0005):** 100 gün daha fazla müsait olmak odds'u 1,0541 katına çıkarmaktadır (%5,41 artış). Etki istatistiksel olarak anlamlı olsa da pratikte küçüktür; büyük örneklemin küçük etkileri bile anlamlı kılabildiğinin bir örneğidir.
+- `bedrooms` (Exp(B) = 2,0461): Bir ek yatak odası yüksek fiyatlı olma odds'unu 2,05 katına çıkarır. Modeldeki en güçlü sayısal etki budur.
+- `bathrooms` (Exp(B) = 1,8607): Bir ek banyo odds'u 1,86 katına çıkarır.
+- `accommodates` (Exp(B) = 1,4609): Bir kişilik ek kapasite odds'u %46,09 artırır. Etki Model 1'deki 1,9704'ten küçüktür, çünkü burada yatak odası ve banyo sayısı sabit tutulduğunda kapasitenin kendi etkisi ölçülmektedir.
+- `number_of_reviews` (Exp(B) = 0,9966): Tek bir yorum çok küçük bir birim olduğu için 100 yorum üzerinden okumak daha anlaşılırdır: 100 ek yorum yüksek fiyatlı olma odds'unu 0,7104 katına indirir (%28,96 azalış).
+- `availability_365` (Exp(B) = 1,0005): 100 gün daha fazla müsait olmak odds'u 1,0541 katına çıkarır (%5,41 artış). Etki istatistiksel olarak anlamlı ama pratikte küçüktür; büyük örneklemde küçük etkiler de anlamlı çıkabilir.
 
 **Kategorik katsayıların yorumu.** Yorumlar diğer değişkenler sabitken ve referans kategoriye göre geçerlidir.
 
-- **`host_is_superhost` = Yes (Exp(B) = 2,5100):** Superhost ilanlarının yüksek fiyatlı olma odds'u, Superhost olmayanlara göre 2,51 katıdır. Bu değer Model 2'dekine (2,5244) çok yakındır; Superhost etkisi diğer özelliklerden büyük ölçüde bağımsızdır.
-- **`shared_bath` = Yes (Exp(B) = 0,7154):** Paylaşımlı banyolu ilanların odds'u, özel banyolu ilanlara göre %28,46 daha düşüktür.
-- **`room_type` = Hotel room (Exp(B) = 4,0738):** Aynı kapasite, yatak odası ve banyo sayısında otel odalarının odds'u, bütün ev/dairelerin 4,07 katıdır.
-  - Model 3'te anlamlı olmayan bu fark, Model 4'te en güçlü etki hâline gelmiştir.
-  - Otel odaları ortalamada daha az yatak odasına sahiptir (0,97, bütün ev/dairelerde 1,58), buna rağmen ortalama fiyatları daha yüksektir (8.504,00 TL ve 6.155,73 TL). Diğer özellikler sabit tutulduğunda otel odası olmanın kendi etkisi ortaya çıkmaktadır.
-- **`room_type` = Private room (Exp(B) = 0,6898):** Özel odaların odds'u %31,02 daha düşüktür. Bu fark, Model 3'teki %72,1'lik farktan çok daha küçüktür; özel odaların daha az yatak odası, banyo ve kapasiteye sahip olmasından kaynaklanan kısım diğer değişkenlerle açıklanmıştır.
-- **`room_type` = Shared room (Exp(B) = 0,7142, p = 0,238):** Bu kukla anlamlı değildir. Diğer özellikler sabitken paylaşımlı odalar bütün ev/dairelerden istatistiksel olarak farklı değildir.
+- `host_is_superhost` = Yes (Exp(B) = 2,5100): Superhost ilanlarının yüksek fiyatlı olma odds'u Superhost olmayanların 2,51 katıdır. Bu değer Model 2'dekine (2,5244) çok yakındır, yani Superhost etkisi diğer özelliklerden büyük ölçüde bağımsızdır.
+- `shared_bath` = Yes (Exp(B) = 0,7154): Paylaşımlı banyolu ilanların odds'u özel banyolu ilanlardan %28,46 düşüktür.
+- `room_type` = Hotel room (Exp(B) = 4,0738): Aynı kapasite, yatak odası ve banyo sayısında otel odalarının odds'u bütün ev/dairelerin 4,07 katıdır. Model 3'te anlamlı olmayan bu fark Model 4'te en güçlü etki olmuştur. Otel odalarında ortalama yatak odası sayısı daha düşük (0,97; bütün ev/dairelerde 1,58), ortalama fiyat ise daha yüksektir (8.504,00 TL ve 6.155,73 TL). Diğer özellikler sabit tutulunca otel odası olmanın kendi etkisi ortaya çıkar.
+- `room_type` = Private room (Exp(B) = 0,6898): Özel odaların odds'u %31,02 daha düşüktür. Fark Model 3'teki %72,1'den çok daha küçüktür, çünkü özel odaların daha az yatak odası, banyo ve kapasiteye sahip olmasından gelen kısım diğer değişkenlerle açıklanmıştır.
+- `room_type` = Shared room (Exp(B) = 0,7142, p = 0,238): Bu kukla anlamlı değildir; diğer özellikler sabitken paylaşımlı odalar bütün ev/dairelerden istatistiksel olarak farklı değildir.
 
-**Uyum iyiliği.**
-
-- **Hosmer–Lemeshow testi:** On grubun tamamı oluşmuştur. χ² = 65,00, df = 8 ve p < 0,001 olduğundan H₀ reddedilmiştir; teste göre modelin uyumu yeterli değildir.
-  - Bu sonuç yorumlanırken HL testinin çok büyük örneklemlerde aşırı duyarlı olduğu göz önünde tutulmalıdır. 16.303 gözlemde, gözlenen ve beklenen değerler arasındaki küçük farklar bile anlamlı çıkabilmektedir.
-  - Bu nedenle uyum, pseudo R² ve sınıflandırma başarısıyla birlikte değerlendirilmiştir.
-- **Pseudo R²:** McFadden 0,2344, Cox & Snell 0,2774, Nagelkerke 0,3699. McFadden değeri 0,2–0,4 aralığındadır ve dört modelin en yüksek değeridir.
+**Uyum iyiliği.** Hosmer–Lemeshow testinde on grubun tamamı oluşmuştur. χ² = 65,00, df = 8 ve p < 0,001 olduğundan H₀ reddedilir; teste göre modelin uyumu yeterli değildir. Ancak HL testi çok büyük örneklemlerde aşırı duyarlıdır ve 16.303 gözlemde gözlenen ve beklenen değerler arasındaki küçük farklar bile anlamlı çıkabilir. Bu yüzden uyum, pseudo R² ve sınıflandırma başarısıyla birlikte değerlendirilmiştir. Pseudo R² değerleri McFadden 0,2344, Cox & Snell 0,2774 ve Nagelkerke 0,3699'dur. McFadden değeri 0,2–0,4 aralığındadır ve dört modelin en yüksek değeridir.
 
 Table: Tablo 19. Model 4 karışıklık matrisi (eşik = 0,50)
 
@@ -756,18 +651,13 @@ Table: Tablo 19. Model 4 karışıklık matrisi (eşik = 0,50)
 | **Gerçek: 0** | TN = 6.660 | FP = 1.502 |
 | **Gerçek: 1** | FN = 2.599 | TP = 5.542 |
 
-**Sınıflandırma başarısı.** Tablo 19'daki karışıklık matrisine göre accuracy = (5.542 + 6.660) / 16.303 = **0,7485 (%74,85)**. Model, %50,06'lık taban orana göre 24,78 puanlık bir iyileşme sağlamaktadır ve dört model arasında en başarılı modeldir.
+**Sınıflandırma başarısı.** Tablo 19'daki karışıklık matrisine göre accuracy = (5.542 + 6.660) / 16.303 = 0,7485 (%74,85). Bu, %50,06'lık taban orana göre 24,78 puanlık bir iyileşmedir ve dört model arasındaki en yüksek değerdir.
 
 ![Şekil 4. Model 4: Kişi kapasitesine ve oda tipine göre yüksek fiyatlı olma olasılığı. Diğer değişkenler sabit tutulmuştur: bedrooms = 1, bathrooms = 1, number_of_reviews = 9, availability_365 = 342 (medyanlar); host_is_superhost = No, shared_bath = No (referans kategoriler).](../output/figures/06_model4_probability_curves.png){width=100%}
 
-**Grafiğin yorumu.** Şekil 4'te diğer sayısal değişkenler medyanlarında, diğer kategorik değişkenler ise referans kategorilerinde sabit tutulmuştur. Dört eğrinin hepsinde olasılık kapasiteyle birlikte artmaktadır; oda tipi ise eğriyi yukarı ya da aşağı kaydırmaktadır.
+**Grafiğin yorumu.** Şekil 4'te diğer sayısal değişkenler medyanlarında, diğer kategorik değişkenler ise referans kategorilerinde sabit tutulmuştur. Dört eğride de olasılık kapasiteyle birlikte artar; oda tipi eğriyi yukarı ya da aşağı kaydırır. 2 kişilik ilanlarda tahmini olasılık Entire home/apt için 0,280, Private room için 0,212, Hotel room için 0,613 ve Shared room için 0,218'dir. 6 kişilik ilanlarda aynı sırayla 0,639, 0,550, 0,878 ve 0,559'dur.
 
-- **2 kişilik ilanlarda** tahmini olasılık: Entire home/apt 0,280, Private room 0,212, Hotel room 0,613, Shared room 0,218.
-- **6 kişilik ilanlarda** tahmini olasılık: sırasıyla 0,639, 0,550, 0,878 ve 0,559.
-- **Hotel room** eğrisi en üsttedir ve 1 kişilik kapasitede bile 0,50 eşiğinin üzerindedir.
-- **Private room ve Shared room** eğrileri, katsayıları birbirine çok yakın olduğu (−0,3713 ve −0,3366) için neredeyse üst üste binmektedir. Diğer özellikler sabitken bu iki oda tipi arasında pratikte bir fark yoktur.
-- Kategoriler arasındaki fark orta kapasitelerde en büyüktür; çok yüksek kapasitelerde bütün eğriler 1'e yaklaşmaktadır.
-- Bazı oda tiplerinde çok yüksek kapasiteli ilan neredeyse bulunmadığından, eğrilerin uç kısımları dikkatli yorumlanmalıdır.
+Hotel room eğrisi en üsttedir ve 1 kişilik kapasitede bile 0,50 eşiğinin üzerindedir. Private room ve Shared room katsayıları birbirine çok yakın olduğu için (−0,3713 ve −0,3366) bu iki eğri neredeyse üst üste biner; diğer özellikler sabitken bu iki oda tipi arasında pratikte fark yoktur. Kategoriler arasındaki fark orta kapasitelerde en büyüktür, çok yüksek kapasitelerde bütün eğriler 1'e yaklaşır. Bazı oda tiplerinde çok yüksek kapasiteli ilan neredeyse olmadığı için eğrilerin uç kısımları dikkatli yorumlanmalıdır.
 
 ## 5.5. Lojistik modellerin karşılaştırılması
 
@@ -782,36 +672,17 @@ Table: Tablo 20. Lojistik regresyon modellerinin uyum iyiliği ve sınıflandır
 
 *Not: Karışıklık matrisleri Tablo 13, 15, 17 ve 19'da verilmiştir. Taban oran (bütün ilanları çoğunluk sınıfı "0" olarak tahmin etme) %50,06'dır. Model 1'de HL testi için on grup yerine altı grup oluşabilmiştir. Model 2 ve 3'te test, yalnızca 2 ve 4 farklı tahmini olasılık bulunduğundan ve modeller doymuş olduğundan uygulanamamıştır.*
 
-Dört modelin uyum ve sınıflandırma ölçütleri Tablo 20'de bir arada sunulmuştur. Tablo 20'de görüldüğü gibi bütün ölçütlere göre en iyi model Model 4'tür; onu Model 1 izlemektedir.
-
-- Model 1'den Model 4'e geçildiğinde bütün pseudo R² değerleri ve accuracy artmıştır. Accuracy'nin yalnızca %71,37'den %74,85'e yükselmesi, sınıflandırmanın büyük bölümünün tek başına kapasite değişkeniyle yapılabildiğini göstermektedir.
-- Tek kategorik değişkenli Model 2 ve 3, her kategoriye tek bir tahmin atayabildiklerinden kaba bir sınıflandırma yapmaktadır. Yine de her ikisi de taban oranın üzerindedir.
+Dört modelin uyum ve sınıflandırma ölçütleri Tablo 20'dedir. Bütün ölçütlere göre en iyi model Model 4'tür, onu Model 1 izler. Model 1'den Model 4'e geçince bütün pseudo R² değerleri ve accuracy artmıştır. Yine de accuracy'nin yalnızca %71,37'den %74,85'e çıkması, sınıflandırmanın büyük bölümünün tek başına kapasite değişkeniyle yapılabildiğini gösterir. Tek kategorik değişkenli Model 2 ve 3 her kategoriye tek bir tahmin atadıkları için kaba bir sınıflandırma yapar, ama ikisi de taban oranın üzerindedir.
 
 # 6. Sonuç
 
-**Doğrusal regresyon bulguları.**
+**Doğrusal regresyon bulguları.** Basit doğrusal regresyonda kişi kapasitesi gecelik fiyatın anlamlı ve pozitif bir belirleyicisi çıkmıştır: her ek kişi fiyatı ortalama 1.049,31 TL artırır. Ancak bu model fiyattaki değişkenliğin yalnızca %28,3'ünü açıklar (R² = 0,2829). Sayısal ve kategorik değişkenlerin birlikte kullanıldığı çoklu modelde başlangıçtaki sekiz değişkenin hepsi anlamlı çıkmış, bu yüzden revizyonda hiçbir değişken çıkarılmamıştır; `room_type` bütün olarak anlamlıdır. Son model fiyattaki değişkenliğin %37,4'ünü açıklar (R² = 0,3737, düzeltilmiş R² = 0,3733). Diğer değişkenler sabitken fiyatı en çok artıran özellikler otel odası olmak (+4.455,75 TL), banyo sayısı (+1.379,35 TL), yatak odası sayısı (+1.267,08 TL) ve Superhost statüsüdür (+1.054,27 TL). Paylaşımlı banyo (−859,04 TL) ve yorum sayısı ise fiyatla negatif yönde ilişkilidir.
 
-- Basit doğrusal regresyonda kişi kapasitesi, gecelik fiyatın anlamlı ve pozitif bir belirleyicisi olarak bulunmuştur. Her ek kişi fiyatı ortalama 1.049,31 TL artırmaktadır. Ancak model, fiyattaki değişkenliğin yalnızca %28,3'ünü açıklamaktadır (R² = 0,2829).
-- Sayısal ve kategorik değişkenlerin birlikte kullanıldığı çoklu doğrusal regresyonda başlangıç modelindeki sekiz değişkenin tamamı anlamlı çıkmış, bu nedenle revizyon adımında hiçbir değişken çıkarılmamıştır. `room_type` değişkeni bütün olarak anlamlıdır.
-- Son model, fiyattaki değişkenliğin %37,4'ünü açıklamaktadır (R² = 0,3737, düzeltilmiş R² = 0,3733).
-- Diğer değişkenler sabitken fiyatı en çok artıran özellikler otel odası olmak (+4.455,75 TL), banyo sayısı (+1.379,35 TL), yatak odası sayısı (+1.267,08 TL) ve Superhost statüsüdür (+1.054,27 TL). Paylaşımlı banyo (−859,04 TL) ve yorum sayısı ise fiyatla negatif yönde ilişkilidir.
+**Lojistik regresyon bulguları.** Dört modelde de bağımsız değişkenler, bir ilanın medyan fiyatın (4.457,5 TL) üzerinde olma odds'uyla anlamlı biçimde ilişkilidir. Karma model (Model 4) en iyi uyumu (McFadden 0,2344, Nagelkerke 0,3699) ve en yüksek sınıflandırma başarısını (%74,85) vermiştir; bu, yaklaşık %50'lik taban orana göre belirgin bir iyileşmedir. Diğer değişkenler sabitken yüksek fiyatlı olma odds'unu en çok artıran özellikler otel odası olmak (4,07 kat), Superhost statüsü (2,51 kat), yatak odası (2,05 kat) ve banyo sayısıdır (1,86 kat). Hosmer–Lemeshow testi Model 1 ve Model 4'te uyumun yetersiz olduğuna işaret etmiştir, ancak bu sonuç büyük örneklemden etkilenmiş olabilir. Model 2 ve Model 3'te test, modellerin yapısı nedeniyle uygulanamamıştır.
 
-**Lojistik regresyon bulguları.**
+**İstatistiksel olarak anlamlı değişkenler.** Her iki analiz türünde de `accommodates`, `bedrooms`, `bathrooms`, `number_of_reviews`, `availability_365`, `host_is_superhost`, `shared_bath` ve bütün olarak `room_type` anlamlı bulunmuştur. Ancak `availability_365` örneğindeki gibi, büyük örneklemde bazı etkiler istatistiksel olarak anlamlı olsa da pratikte küçüktür.
 
-- Dört modelde de bağımsız değişkenler, bir ilanın medyan fiyatın (4.457,5 TL) üzerinde olma odds'u ile anlamlı biçimde ilişkilidir.
-- Karma model (Model 4) en iyi uyumu (McFadden 0,2344, Nagelkerke 0,3699) ve en yüksek sınıflandırma başarısını (%74,85) göstermiştir. Bu başarı, yaklaşık %50'lik taban orana göre belirgin bir iyileşmedir.
-- Diğer değişkenler sabitken yüksek fiyatlı olma odds'unu en çok artıran özellikler otel odası olmak (4,07 kat), Superhost statüsü (2,51 kat), yatak odası (2,05 kat) ve banyo sayısıdır (1,86 kat).
-- Hosmer–Lemeshow testi Model 1 ve Model 4'te uyumun yetersiz olduğuna işaret etmiştir. Ancak bu sonuç büyük örneklemden etkilenmiş olabilir. Model 2 ve Model 3'te test, modellerin yapısı nedeniyle uygulanamamıştır.
-
-**İstatistiksel olarak anlamlı değişkenler.** Her iki analiz türünde de `accommodates`, `bedrooms`, `bathrooms`, `number_of_reviews`, `availability_365`, `host_is_superhost`, `shared_bath` ve bütün olarak `room_type` anlamlı bulunmuştur. Bununla birlikte `availability_365` örneğinde görüldüğü gibi, büyük örneklemde bazı etkiler istatistiksel olarak anlamlı olsa da pratikte küçüktür.
-
-**Genel değerlendirme.** Doğrusal ve lojistik modeller tutarlı bir tablo ortaya koymaktadır: katsayıların yönleri iki yöntemde aynıdır. İstanbul'daki kısa dönem Airbnb ilanlarında fiyatı belirleyen başlıca etkenler:
-
-- mekânın büyüklüğü (kapasite, yatak odası ve banyo sayısı),
-- kiralanan alanın türü,
-- ev sahibinin Superhost statüsüdür.
-
-Doğrusal model bu etkileri "kaç TL" sorusuyla, lojistik model ise "yüksek fiyat grubunda olma odds'u kaç kat değişir" sorusuyla ifade etmektedir. Her iki modelde de fiyattaki değişkenliğin önemli bir kısmı açıklanamamıştır. Bu durum, fiyatın konum ve mekân niteliği gibi bu çalışmada yer almayan başka etkenlere de bağlı olduğunu göstermektedir.
+**Genel değerlendirme.** Doğrusal ve lojistik modellerde katsayıların yönleri aynıdır. İstanbul'daki kısa dönem Airbnb ilanlarında fiyatı belirleyen başlıca etkenler mekânın büyüklüğü (kapasite, yatak odası ve banyo sayısı), kiralanan alanın türü ve ev sahibinin Superhost statüsüdür. Doğrusal model bu etkileri TL cinsinden, lojistik model ise yüksek fiyat grubunda olma odds'unun kaç kat değiştiği üzerinden ifade eder. İki modelde de fiyattaki değişkenliğin önemli bir kısmı açıklanamamıştır. Bu, fiyatın konum ve mekânın niteliği gibi bu çalışmada yer almayan etkenlere de bağlı olduğunu gösterir.
 
 # Kaynakça
 
